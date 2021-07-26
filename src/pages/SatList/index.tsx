@@ -3,25 +3,22 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
-import { ModalForm, ProFormCheckbox, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import ProDescriptions, { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import UpdateForm from './components/UpdateForm';
 import CreateForm from './components/CreateForm';
-import ResetPasswdModal from './components/ResetPasswdModal';
-import { NewUserParam, UserListItem, UpdateUserParam, ResetPasswordParam } from './data';
+import { NewSatParam, SatListItem, UpdateSatParam, } from './data';
 import { ReloadOutlined, PlusOutlined, WarningOutlined } from '@ant-design/icons';
-import { queryUser, updateUser, addUser, batRemoveUser, removeUser, resetPassword } from './service';
+import { querySat, updateSat, addSat, batRemoveSat, removeSat } from './service';
 import { getUserData } from '../../utils/authority'
 import { CurrentUser } from '../../models/user'
-import Password from 'antd/lib/input/Password';
 
 const { confirm } = Modal;
 const { Search } = Input
 
-const handleAdd = async (fields: NewUserParam) => {
+const handleAdd = async (fields: NewSatParam) => {
   const hide = message.loading('正在添加');
   try {
-    await addUser(fields);
+    await addSat(fields);
     hide;
     message.success('添加成功');
     return true;
@@ -33,13 +30,13 @@ const handleAdd = async (fields: NewUserParam) => {
 };
 
 /**
-* 更新用户
+* 更新卫星
 * @param fields
 */
-const handleUpdate = async (record: UserListItem, fields: UpdateUserParam) => {
+const handleUpdate = async (record: SatListItem, fields: UpdateSatParam) => {
   const hide = message.loading('正在更新');
   try {
-    await updateUser(record.id, fields);
+    await updateSat(record.id, fields);
     hide;
 
     message.success('配置成功');
@@ -51,30 +48,11 @@ const handleUpdate = async (record: UserListItem, fields: UpdateUserParam) => {
   }
 };
 
-/**
-* 重置用户密码
-* @param fields
-*/
-const handleResetPasswd = async (param: ResetPasswordParam) => {
-  const hide = message.loading('正在更新');
-  try {
-    await resetPassword(param.id, param.newPassword);
-    hide;
-
-    message.success('配置成功');
-    return true;
-  } catch (error) {
-    hide;
-    message.error('配置失败请重试！');
-    return false;
-  }
-};
-
-const deletable = (record: UserListItem, currentUser: CurrentUser | undefined) => {
+const deletable = (record: SatListItem, currentUser: CurrentUser | undefined) => {
   if (currentUser === undefined) {
     return false
   } else {
-    //return record.adminId !== 0 && record.id !== currentUser.id
+    //return record.adminId !== 0 && record.id !== currentSat.id
     return record.id !== currentUser.id
   }
 }
@@ -86,15 +64,14 @@ const TableList: React.FC<{}> = () => {
    */
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-  const [resetPasswdModalVisible, handleResetPasswdModalVisible] = useState<boolean>(false);
-  const [editingRecord, setEditingRecord] = useState<UserListItem | undefined>(undefined);
+  const [editingRecord, setEditingRecord] = useState<SatListItem | undefined>(undefined);
   const [keyword, setKeyword] = useState<string>('');
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<UserListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<UserListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<SatListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<SatListItem[]>([]);
 
   /**
    * 国际化配置
@@ -102,20 +79,25 @@ const TableList: React.FC<{}> = () => {
   const intl = useIntl();
   const currentUserData = getUserData();
 
-  const columns: ProColumns<UserListItem>[] = [
+  const columns: ProColumns<SatListItem>[] = [
     {
       title: (
         <FormattedMessage
-          id="pages.userTable.userItem.nameLabel"
-          defaultMessage="姓名"
+          id="pages.satTable.satItem.nameLabel"
+          defaultMessage="名称"
         />
       ),
       dataIndex: 'name',
     },
     {
-      title: <FormattedMessage id="pages.userTable.userItem.emailLabel"
-        defaultMessage="邮箱" />,
-      dataIndex: 'email',
+      title: <FormattedMessage id="pages.satTable.satItem.noardIdLabel"
+        defaultMessage="NoardID" />,
+      dataIndex: 'noardId',
+    },
+    {
+      title: <FormattedMessage id="pages.satTable.satItem.oleColorLabel"
+        defaultMessage="OleColor" />,
+      dataIndex: 'oleColor',
     },
     {
       title: '操作',
@@ -131,13 +113,12 @@ const TableList: React.FC<{}> = () => {
           编辑
         </a>,
         <a key="delete"
-          style={deletable(record, currentUserData) ? {} : { display: 'none' }}
           onClick={async () => {
             confirm({
               title: '删除',
               icon: <WarningOutlined />,
               content: (<span>
-                确定要删除用户{' '}
+                确定要删除卫星{' '}
                 <i>
                   <b>{record.name}</b>
                 </i>{' '}
@@ -147,7 +128,7 @@ const TableList: React.FC<{}> = () => {
                 const hide = message.loading('正在删除');
                 if (!record.id) return true;
                 try {
-                  await removeUser(record.id);
+                  await removeSat(record.id);
                   hide;
                   message.success('删除成功，即将刷新');
                   actionRef.current?.reload();
@@ -162,23 +143,15 @@ const TableList: React.FC<{}> = () => {
           }}>
           删除
         </a>,
-        <a key="resetPassword"
-          style={deletable(record, currentUserData) ? {} : { display: 'none' }}
-          onClick={() => {
-            handleResetPasswdModalVisible(true);
-            setEditingRecord(record)
-          }}>
-          重置密码
-        </a >,
       ],
     },
   ];
 
   return (
     <PageContainer>
-      <div className="userListHeader">
+      <div className="satListHeader">
         <Row style={{ marginBottom: 8 }}>
-          <Col flex="100px" className="addUser">
+          <Col flex="100px" className="addSat">
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -188,7 +161,7 @@ const TableList: React.FC<{}> = () => {
               新建
           </Button>
           </Col>
-          <Col flex="100px" className="addUser">
+          <Col flex="100px" className="addSat">
             <Button
               icon={<ReloadOutlined />}
               style={{ marginRight: 8 }}
@@ -197,7 +170,7 @@ const TableList: React.FC<{}> = () => {
               刷新
           </Button>
           </Col>
-          <Col flex="auto" className="queryUser">
+          <Col flex="auto" className="querySat">
             <Search placeholder="输入关键字查询"
               onChange={e => {
                 if (e.target.value === undefined || e.target.value === '') {
@@ -213,16 +186,15 @@ const TableList: React.FC<{}> = () => {
           </Col>
         </Row>
       </div>
-      <ProTable<UserListItem>
+      <ProTable<SatListItem>
         actionRef={actionRef}
-        rowKey="email"
+        rowKey="id"
         search={false}
         toolBarRender={false}
-        request={() => queryUser()}
+        request={() => querySat()}
         postData={(data) => {
           return data.filter(
-            a => a.email.toUpperCase().indexOf(keyword.toUpperCase()) !== -1 ||
-              a.name.toUpperCase().indexOf(keyword.toUpperCase()) !== -1)
+            a => a.name.toUpperCase().indexOf(keyword.toUpperCase()) !== -1 )
         }}
         columns={columns}
         rowSelection={{
@@ -247,7 +219,7 @@ const TableList: React.FC<{}> = () => {
                     title: '删除',
                     icon: <WarningOutlined />,
                     content: (<span>
-                      确定要删除用户{' '}
+                      确定要删除卫星{' '}
                       <i>
                         <b>{selectedRowsState.map(row => row.name).join(',')}</b>
                       </i>{' '}
@@ -257,7 +229,7 @@ const TableList: React.FC<{}> = () => {
                       const hide = message.loading('正在删除');
                       if (!selectedRowsState) return true;
                       try {
-                        await batRemoveUser(selectedRowsState.map(row => row.id));
+                        await batRemoveSat(selectedRowsState.map(row => row.id));
                         hide;
                         message.success('删除成功，即将刷新');
                         setSelectedRows([]);
@@ -281,7 +253,7 @@ const TableList: React.FC<{}> = () => {
         modalVisible={createModalVisible}
         onCancel={() => handleModalVisible(false)}
         onOk={async (value) => {
-          const success = await handleAdd(value as NewUserParam);
+          const success = await handleAdd(value as NewSatParam);
           if (success) {
             handleModalVisible(false);
             if (actionRef.current) {
@@ -301,35 +273,13 @@ const TableList: React.FC<{}> = () => {
           }}
           editingRecord={editingRecord}
           onOk={async (editingRecord, value) => {
-            const success = await handleUpdate(editingRecord, value as UpdateUserParam);
+            const success = await handleUpdate(editingRecord, value as UpdateSatParam);
             if (success) {
-              handleResetPasswdModalVisible(false);
               setEditingRecord(undefined);
             }
           }}
         >
         </UpdateForm>
-      ) : null}
-      {editingRecord !== undefined ? (
-        <ResetPasswdModal
-          modalVisible={resetPasswdModalVisible}
-          onCancel={() => {
-            handleModalVisible(false)
-            setEditingRecord(undefined)
-          }}
-          editingRecord={editingRecord}
-          onOk={async (value) => {
-            const success = await handleResetPasswd(value as ResetPasswordParam);
-            if (success) {
-              handleUpdateModalVisible(false);
-              setEditingRecord(undefined);
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
-            }
-          }}
-        >
-        </ResetPasswdModal>
       ) : null}
 
       <Drawer
@@ -342,7 +292,7 @@ const TableList: React.FC<{}> = () => {
         closable={false}
       >
         {currentRow?.name && (
-          <ProDescriptions<UserListItem>
+          <ProDescriptions<SatListItem>
             column={2}
             title={currentRow?.name}
             request={async () => ({
@@ -351,7 +301,7 @@ const TableList: React.FC<{}> = () => {
             params={{
               id: currentRow?.name,
             }}
-            columns={columns as ProDescriptionsItemProps<UserListItem>[]}
+            columns={columns as ProDescriptionsItemProps<SatListItem>[]}
           />
         )}
       </Drawer>

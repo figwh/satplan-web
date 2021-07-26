@@ -141,4 +141,13 @@ export default {
   'pages.createPipelineByTemplateForm.destInfoRule': 'Please select archive dest',
   'pages.userSettings.oldPasswordRule':'Please select old password',
   'pages.userSettings.newPasswordRule':'Please select new password',
+  'pages.satTable.satItem.nameLabel': 'Name',
+  'pages.satTable.satItem.noardIdLabel': 'NoardID',
+  'pages.satTable.satItem.oleColorLabel': 'OleColor',
+  'pages.satTable.satItem.action': 'Action',
+  'pages.satTable.satItem.edit': 'Edit',
+  'pages.satTable.satItem.delete': 'Delete',
+  'pages.satTable.newSat': 'Create Satellite',
+  'pages.satTable.editSat': 'Edit Satellite',
+  'pages.satTable.satNameRule': 'Please input sat name',
 };

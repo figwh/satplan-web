@@ -46,4 +46,5 @@ export default {
   'menu.list.pipeline-list.pipelines': '流水线',
   'menu.list.pipeline-list.stages': '流水线步骤',
   'menu.list.pipeline-list.templates': '流水线模板',
+  'menu.list.sat-list': '卫星',
 };

@@ -46,4 +46,5 @@ export default {
   'menu.list.pipeline-list.pipelines': 'Pipeline List',
   'menu.list.pipeline-list.stages': 'Stage List',
   'menu.list.pipeline-list.templates': 'Template List',
+  'menu.list.sat-list': 'Satellite',
 };

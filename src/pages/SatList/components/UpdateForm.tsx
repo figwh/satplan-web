@@ -1,13 +1,13 @@
 import React from 'react';
 import { ModalForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { useIntl, FormattedMessage } from 'umi';
-import { UpdateUserParam, UserListItem } from '../data';
+import { UpdateSatParam, SatListItem } from '../data';
 
 interface UpdateFormProps {
   modalVisible: boolean;
   onCancel: () => void;
-  editingRecord: UserListItem,
-  onOk: (record: UserListItem, value: UpdateUserParam) => void;
+  editingRecord: SatListItem,
+  onOk: (record: SatListItem, value: UpdateSatParam) => void;
 }
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
@@ -20,8 +20,8 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       labelCol={{ span: 5 }}
       wrapperCol={{ span: 16 }}
       title={intl.formatMessage({
-        id: 'pages.userTable.editUser',
-        defaultMessage: '编辑用户',
+        id: 'pages.satTable.editSat',
+        defaultMessage: '编辑卫星',
       })}
       width="500px"
       visible={modalVisible}
@@ -30,7 +30,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       }}
       onFinish={(value) => {
         return new Promise((resolve) => {
-          onOk(editingRecord, value as UpdateUserParam)
+          onOk(editingRecord, value as UpdateSatParam)
           resolve()
         })
       }}
@@ -39,21 +39,20 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         rules={[
           {
             required: true,
-            type: 'email',
             message: (
               <FormattedMessage
-                id="pages.userTable.emailRule"
-                defaultMessage="请输入正确的邮箱格式"
+                id="pages.satTable.satNameRule"
+                defaultMessage="请输入正确的卫星名"
               />
             ),
           },
         ]}
         width="md"
-        name="email"
-        label="邮箱"
-        placeholder="邮箱"
+        name="satName"
+        label="卫星名"
+        placeholder="卫星名"
         disabled={true}
-        initialValue={editingRecord.email}
+        initialValue={editingRecord.name}
       />
       <ProFormText
         rules={[
@@ -61,24 +60,18 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             required: true,
             message: (
               <FormattedMessage
-                id="pages.userTable.userNameRule"
-                defaultMessage="请输入姓名"
+                id="pages.satTable.oleColorRule"
+                defaultMessage="请输入颜色"
               />
             ),
           },
         ]}
         width="md"
-        name="userName"
-        initialValue={editingRecord.name}
-        label="姓名"
-        placeholder="姓名"
+        name="oleColor"
+        initialValue={editingRecord.oleColor}
+        label="颜色"
+        placeholder="颜色"
       />
-      <ProFormCheckbox
-        colon={false}
-        name="isAdmin"
-        label="         "
-        initialValue={editingRecord.isAdmin}
-      >设为管理员</ProFormCheckbox>
     </ModalForm>
   );
 };

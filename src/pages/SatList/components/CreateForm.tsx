@@ -1,13 +1,13 @@
 import React from 'react';
 import { ModalForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { useIntl, FormattedMessage } from 'umi';
-import { NewUserParam } from '../data';
+import { NewSatParam } from '../data';
 import { Modal, Form, Input, Checkbox, Select } from 'antd'
 
 interface CreateFormProps {
   modalVisible: boolean;
   onCancel: () => void;
-  onOk: (value: NewUserParam) => Promise<boolean>;
+  onOk: (value: NewSatParam) => Promise<boolean>;
 }
 
 const CreateForm: React.FC<CreateFormProps> = (props) => {
@@ -22,8 +22,8 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
       labelCol={{ span: 5 }}
       wrapperCol={{ span: 16 }}
       title={intl.formatMessage({
-        id: 'pages.userTable.newUser',
-        defaultMessage: '新建用户',
+        id: 'pages.satTable.newSat',
+        defaultMessage: '新建卫星',
       })}
       width="500px"
       labelAlign='right'
@@ -32,55 +32,31 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         onCancel: onCancel
       }}
       onFinish={async (value) => {
-        onOk(value as NewUserParam).then(() => { form.resetFields() })
+        onOk(value as NewSatParam).then(() => { form.resetFields() })
       }}
     >
       <ProFormText
         rules={[
           {
             required: true,
-            type: 'email',
-            message: (
-              <FormattedMessage
-                id="pages.userTable.emailRule"
-                defaultMessage="请输入正确的邮箱格式"
-              />
-            ),
           },
         ]}
         width="md"
-        name="email"
-        label="邮箱"
-        placeholder="邮箱"
+        name="satName"
+        label="卫星名"
+        placeholder="卫星名"
       />
       <ProFormText
         rules={[
           {
             required: true,
-            message: (
-              <FormattedMessage
-                id="pages.userTable.userNameRule"
-                defaultMessage="请输入姓名"
-              />
-            ),
           },
         ]}
         width="md"
-        name="userName"
-        label="姓名"
-        placeholder="姓名"
+        name="tle"
+        label="TLE"
+        placeholder="TLE"
       />
-      <ProFormText
-        width="md"
-        name="password"
-        label="密码"
-        placeholder="选填，默认密码：12345678"
-      />
-      <ProFormCheckbox
-        colon={false}
-        name="isAdmin"
-        label="  "
-      >设为管理员</ProFormCheckbox>
     </ModalForm>
   );
 };

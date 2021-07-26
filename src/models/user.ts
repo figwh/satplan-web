@@ -13,12 +13,12 @@ const UserRoleIdMap = new Map([
 export interface MenuAuthItem {
   id?: number;
   pId?: number;
-  menuName?: string;
+  //menuName?: string;
   url?: string;
-  icon?: string;
-  comName?: string;
-  sort?: number;
-  routingType?: number;
+  //icon?: string;
+  //comName?: string;
+  //sort?: number;
+  //routingType?: number;
 }
 
 export interface CurrentUser {

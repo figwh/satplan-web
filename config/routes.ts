@@ -25,14 +25,14 @@
             routes: [
               {
                 path: '/',
-                redirect: '/users',
+                redirect: '/sats',
               },
               {
-                name: 'list.user-list',
+                name: 'list.sat-list',
                 icon: 'user',
-                path: '/users',
+                path: '/sats',
                 authority: ['platform_admin', 'admin'],
-                component: './UserList',
+                component: './SatList',
               },
               {
                 component: './404',
