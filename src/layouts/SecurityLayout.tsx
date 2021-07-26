@@ -36,6 +36,7 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
     const { children, loading, currentUser } = this.props;
     // You can replace it to your authentication rule (such as check token exists)
     const isLogin = currentUser && currentUser.id;
+    console.log(children)
     const queryString = stringify({
       redirect: window.location.href,
     });
