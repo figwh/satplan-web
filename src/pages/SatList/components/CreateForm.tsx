@@ -1,8 +1,8 @@
 import React from 'react';
-import { ModalForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
+import { ModalForm, ProFormTextArea, ProFormText } from '@ant-design/pro-form';
 import { useIntl, FormattedMessage } from 'umi';
 import { NewSatParam } from '../data';
-import { Modal, Form, Input, Checkbox, Select } from 'antd'
+import { Modal, Form,  Input, Checkbox, Select } from 'antd'
 
 interface CreateFormProps {
   modalVisible: boolean;
@@ -11,7 +11,7 @@ interface CreateFormProps {
 }
 
 const CreateForm: React.FC<CreateFormProps> = (props) => {
-  const { modalVisible, onCancel,  onOk } = props;
+  const { modalVisible, onCancel, onOk } = props;
   const intl = useIntl();
   const [form] = Form.useForm();
 
@@ -25,7 +25,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         id: 'pages.satTable.newSat',
         defaultMessage: '新建卫星',
       })}
-      width="500px"
+      width="700px"
       labelAlign='right'
       visible={modalVisible}
       modalProps={{
@@ -35,27 +35,22 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         onOk(value as NewSatParam).then(() => { form.resetFields() })
       }}
     >
-      <ProFormText
+      <ProFormTextArea
         rules={[
           {
             required: true,
           },
         ]}
+        width="lg"
+        name="tle"
+        label="TLE"
+        placeholder="TLE"
+      />
+      <ProFormText
         width="md"
         name="satName"
         label="卫星名"
         placeholder="卫星名"
-      />
-      <ProFormText
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-        width="md"
-        name="tle"
-        label="TLE"
-        placeholder="TLE"
       />
     </ModalForm>
   );

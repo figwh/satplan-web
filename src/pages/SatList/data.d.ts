@@ -17,7 +17,8 @@ export interface SatListItem {
   senItems: SenItemInfo[];
 }
 
-export interface SenitemInfo {
+export interface SenItemInfo {
+  id: number;
   name: string;
   resolution: number;
   width: number;

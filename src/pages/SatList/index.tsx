@@ -8,7 +8,7 @@ import UpdateForm from './components/UpdateForm';
 import CreateForm from './components/CreateForm';
 import { NewSatParam, SatListItem, UpdateSatParam, } from './data';
 import { ReloadOutlined, PlusOutlined, WarningOutlined } from '@ant-design/icons';
-import { querySat, updateSat, addSat, batRemoveSat, removeSat } from './service';
+import { querySat, updateSat, addSat, batRemoveSat, removeSat, removeSen } from './service';
 import { getUserData } from '../../utils/authority'
 import { CurrentUser } from '../../models/user'
 
@@ -112,6 +112,15 @@ const TableList: React.FC<{}> = () => {
         >
           编辑
         </a>,
+        <a
+          key="addsen"
+          onClick={() => {
+            handleUpdateModalVisible(true);
+            setEditingRecord(record)
+          }}
+        >
+          添加载荷
+         </a>,
         <a key="delete"
           onClick={async () => {
             confirm({
@@ -160,6 +169,52 @@ const TableList: React.FC<{}> = () => {
           { title: '右侧摆角', dataIndex: 'rightSideAngle', key: 'rightSideAngle' },
           { title: '安装角', dataIndex: 'initAngle', key: 'initAngle' },
           { title: 'OleColor', dataIndex: 'oleColor', key: 'oleColor' },
+          {
+            title: '操作',
+            valueType: 'option',
+            render: (text, record, _, action) => [
+              <a
+                key="editable"
+                onClick={() => {
+                  handleUpdateModalVisible(true);
+                  //setEditingRecord(record)
+                }}
+              >
+                编辑
+              </a>,
+              <a key="delete"
+                onClick={async () => {
+                  confirm({
+                    title: '删除',
+                    icon: <WarningOutlined />,
+                    content: (<span>
+                      确定要删除载荷{' '}
+                      <i>
+                        <b>{record.name}</b>
+                      </i>{' '}
+                     吗？
+                    </span>),
+                    onOk: async () => {
+                      const hide = message.loading('正在删除');
+                      if (!record.id) return true;
+                      try {
+                        await removeSen(record.id);
+                        hide;
+                        message.success('删除成功，即将刷新');
+                        actionRef.current?.reload();
+                        return true;
+                      } catch (error) {
+                        hide;
+                        message.error('删除失败，请重试');
+                        return false;
+                      }
+                    },
+                  });
+                }}>
+                删除
+             </a>,
+            ]
+          },
         ]}
         rowKey="name"
         headerTitle={false}
@@ -218,7 +273,7 @@ const TableList: React.FC<{}> = () => {
         request={() => querySat()}
         postData={(data) => {
           return data.filter(
-            a => a.name.toUpperCase().indexOf(keyword.toUpperCase()) !== -1 )
+            a => a.name.toUpperCase().indexOf(keyword.toUpperCase()) !== -1)
         }}
         expandedRowRender={(record) => expandedRowRender(record)}
         columns={columns}

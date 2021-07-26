@@ -39,19 +39,25 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         rules={[
           {
             required: true,
-            message: (
-              <FormattedMessage
-                id="pages.satTable.satNameRule"
-                defaultMessage="请输入正确的卫星名"
-              />
-            ),
+          },
+        ]}
+        width="md"
+        name="satNoardId"
+        label="NoardID"
+        placeholder="NoardID"
+        disabled={true}
+        initialValue={editingRecord.noardId}
+      />
+      <ProFormText
+        rules={[
+          {
+            required: true,
           },
         ]}
         width="md"
         name="satName"
         label="卫星名"
         placeholder="卫星名"
-        disabled={true}
         initialValue={editingRecord.name}
       />
       <ProFormText

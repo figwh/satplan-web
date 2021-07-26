@@ -43,3 +43,9 @@ export async function updateSat(satId: number, params: UpdateSatParam) {
     },
   });
 }
+
+export async function removeSen(senId: number) {
+  return request(`/api/sen/${senId}`, {
+    method: 'DELETE'
+  });
+}
