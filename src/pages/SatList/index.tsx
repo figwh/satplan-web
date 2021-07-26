@@ -147,6 +147,30 @@ const TableList: React.FC<{}> = () => {
     },
   ];
 
+  const expandedRowRender = (row: SatListItem) => {
+    return (
+      <ProTable
+        columns={[
+          { title: '名称', dataIndex: 'name', key: 'name' },
+          {
+            title: '分辨率', dataIndex: 'resolution', key: 'resolution',
+          },
+          { title: '幅宽', dataIndex: 'width', key: 'width' },
+          { title: '左侧摆角', dataIndex: 'leftSideAngle', key: 'leftSideAngle' },
+          { title: '右侧摆角', dataIndex: 'rightSideAngle', key: 'rightSideAngle' },
+          { title: '安装角', dataIndex: 'initAngle', key: 'initAngle' },
+          { title: 'OleColor', dataIndex: 'oleColor', key: 'oleColor' },
+        ]}
+        rowKey="name"
+        headerTitle={false}
+        search={false}
+        options={false}
+        dataSource={row.senItems}
+        pagination={false}
+      />
+    );
+  };
+
   return (
     <PageContainer>
       <div className="satListHeader">
@@ -196,6 +220,7 @@ const TableList: React.FC<{}> = () => {
           return data.filter(
             a => a.name.toUpperCase().indexOf(keyword.toUpperCase()) !== -1 )
         }}
+        expandedRowRender={(record) => expandedRowRender(record)}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => setSelectedRows(selectedRows),

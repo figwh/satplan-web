@@ -14,6 +14,18 @@ export interface SatListItem {
   name: string;
   noardId: string;
   oleColor: number;
+  senItems: SenItemInfo[];
+}
+
+export interface SenitemInfo {
+  name: string;
+  resolution: number;
+  width: number;
+  rightSideAngle: number;
+  leftSideAngle: number;
+  observeAngle: number;
+  initAngle: number;
+  oleColor: number;
 }
 
 
