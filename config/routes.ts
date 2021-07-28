@@ -4,6 +4,10 @@
     component: '../layouts/BlankLayout',
     routes: [
       {
+        path: '/',
+        redirect: '/plan',
+      },
+      {
         path: '/plan',
         component: '../layouts/MapLayout',
       },
