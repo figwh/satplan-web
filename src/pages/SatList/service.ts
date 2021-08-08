@@ -49,3 +49,9 @@ export async function removeSen(senId: number) {
     method: 'DELETE'
   });
 }
+
+export async function updateTles() {
+  return request(`/api/sat/tle/update`, {
+    method: 'POST'
+  });
+}

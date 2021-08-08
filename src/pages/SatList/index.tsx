@@ -8,7 +8,7 @@ import UpdateForm from './components/UpdateForm';
 import CreateForm from './components/CreateForm';
 import { NewSatParam, SatListItem, UpdateSatParam, } from './data';
 import { ReloadOutlined, PlusOutlined, WarningOutlined } from '@ant-design/icons';
-import { querySat, updateSat, addSat, batRemoveSat, removeSat, removeSen } from './service';
+import { querySat, updateSat,updateTles, addSat, batRemoveSat, removeSat, removeSen } from './service';
 import { getUserData } from '../../utils/authority'
 import { CurrentUser } from '../../models/user'
 
@@ -238,6 +238,27 @@ const TableList: React.FC<{}> = () => {
               onClick={() => handleModalVisible(true)}
             >
               新建
+          </Button>
+          </Col>
+          <Col flex="100px" className="addSat">
+            <Button
+              icon={<ReloadOutlined />}
+              style={{ marginRight: 8 }}
+              onClick={ async () => {
+                const hide = message.loading('正在更新');
+                try {
+                  await updateTles();
+                  hide;
+                  message.success('更新成功');
+                  return true;
+                } catch (error) {
+                  hide;
+                  message.error('更新失败，请重试');
+                  return false;
+                }
+              }}
+            >
+              更新 TLE
           </Button>
           </Col>
           <Col flex="100px" className="addSat">
