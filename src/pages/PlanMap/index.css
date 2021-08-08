@@ -1,22 +1,22 @@
 .logo {
   height: 32px;
   margin: 16px;
-  background: rgba(255, 255, 255, 0.3);
 }
 
 .site-layout .site-layout-background {
   background: #fff;
 }
-  [data-theme="dark"] .site-layout .site-layout-background {
-    background: #141414;
-  }
+
+[data-theme="dark"] .site-layout .site-layout-background {
+  background: #141414;
+}
   
-  .title {
-    position: relative;
-    top: 2px;
-    color: fade(#000,85%);
-    font-weight: 600;
-    font-size: 33px;
-    font-family: Avenir, 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  }
+.title {
+  position: relative;
+  top: 2px;
+  color: fade(#000,85%);
+  font-weight: 600;
+  font-size: 22px;
+  font-family: Avenir, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
   

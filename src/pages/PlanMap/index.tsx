@@ -44,7 +44,7 @@ const PlanMap: React.FC<{}> = () => {
   const [checkedSenIds, setCheckedSenIds] = useState<number[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
-  const [planningDays, setPlanningDays] = useState<number>(1);
+  const [planningDays, setPlanningDays] = useState<number>(3);
   const refPlanningDays = useRef<number>(planningDays)
   const [satTree, setSatTree] = useState<DataNode[]>()
   const refGraph = useRef<HTMLDivElement>(null)
@@ -268,17 +268,22 @@ const PlanMap: React.FC<{}> = () => {
       <Layout className="site-layout">
         <Header className="site-layout-background" style={{ padding: 0 }}>
           <span style={{color: "white"}}>Planning in next : </span>
-          <Select defaultValue="7" style={{ width: 120 }} onChange={e => {
+          <Select defaultValue="3" style={{ width: 120 }} onChange={e => {
             setPlanningDays(Number(e))
           }}>
             <Option value="1">1</Option>
             <Option value="2">2</Option>
+            <Option value="3">3</Option>
+            <Option value="4">4</Option>
+            <Option value="5">5</Option>
+            <Option value="6">6</Option>
+            <Option value="7">7</Option>
           </Select>
           <span style={{color: "white"}}>days</span>
           <Button type="primary">Draw Area</Button>
         </Header>
         <Content style={{ margin: '0 0px' }}>
-          <div ref={refGraph} className="map" id="map" style={{ width: '100%', height: '500px' }}></div>
+          <div ref={refGraph} className="map" id="map" style={{ width: '100%', height: '100vh' }}></div>
         </Content>
       </Layout>
     </Layout>
