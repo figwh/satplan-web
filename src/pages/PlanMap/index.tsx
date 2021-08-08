@@ -1,7 +1,6 @@
-import { Button, Space, message, Input, Row, Col, Modal, Drawer } from 'antd';
+import { Button, Select } from 'antd';
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
-import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 import { SatItem, SenItem, DataNode, PlanPara, SatSen, PathUnit, SenPath } from './data';
 import { querySatTree, querySensorPaths } from './service';
 import { Layout, Menu, Breadcrumb, Tree } from 'antd';
@@ -27,7 +26,7 @@ import Polygon from 'ol/geom/Polygon';
 import Geometry from 'ol/geom/Geometry';
 import Point from 'ol/geom/Point';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
-
+const { Option } = Select;
 
 //TODO
 /*
@@ -44,6 +43,8 @@ const PlanMap: React.FC<{}> = () => {
   const [checkedSenIds, setCheckedSenIds] = useState<number[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
+  const [planningDays, setPlanningDays] = useState<number>(1);
+  const refPlanningDays = useRef<number>(planningDays)
   const [satTree, setSatTree] = useState<DataNode[]>()
   const refGraph = useRef<HTMLDivElement>(null)
   const refSenIds = useRef<number[]>(checkedSenIds)
@@ -54,6 +55,7 @@ const PlanMap: React.FC<{}> = () => {
   const { formatMessage } = useIntl();
 
   refSenIds.current = checkedSenIds
+  refPlanningDays.current = planningDays
 
   const mousePositionControl = new MousePosition({
     coordinateFormat: createStringXY(4),
@@ -107,7 +109,7 @@ const PlanMap: React.FC<{}> = () => {
     querySensorPaths({
       checkedSenIds: refSenIds.current,
       start: 1517512450,
-      stop: 1517512450 + 86400,
+      stop: 1517512450 + 86400 * refPlanningDays.current,
       xmin: ext[0],
       xmax: ext[2],
       ymin: ext[1],
@@ -234,7 +236,6 @@ const PlanMap: React.FC<{}> = () => {
     //setSelectedKeys(selectedKeysValue);
   };
 
-
   /**
    * 国际化配置
    */
@@ -259,7 +260,17 @@ const PlanMap: React.FC<{}> = () => {
 
       </Sider>
       <Layout className="site-layout">
-        <Header className="site-layout-background" style={{ padding: 0 }} />
+        <Header className="site-layout-background" style={{ padding: 0 }}>
+          <span>Planning in next : </span>
+          <Select defaultValue="7" style={{ width: 120 }} onChange={e => {
+            setPlanningDays(Number(e))
+          }}>
+            <Option value="1">1</Option>
+            <Option value="2">2</Option>
+          </Select>
+          <span>days</span>
+          <Button type="primary">Draw Area</Button>
+        </Header>
         <Content style={{ margin: '0 0px' }}>
           <div ref={refGraph} className="map" id="map" style={{ width: '100%', height: '500px' }}></div>
         </Content>

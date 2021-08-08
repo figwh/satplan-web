@@ -7,27 +7,12 @@ import ProLayout, {
   MenuDataItem,
   BasicLayoutProps as ProLayoutProps,
   Settings,
-  DefaultFooter,
 } from '@ant-design/pro-layout';
-import request from '@/utils/request';
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Link, useIntl, connect, Dispatch, history } from 'umi';
-import { Result, Button } from 'antd';
 import Authorized from '@/utils/Authorized';
-import RightContent from '@/components/GlobalHeader/RightContent';
 import { ConnectState } from '@/models/connect';
-import { getMatchMenu } from '@umijs/route-utils';
-import logo from '../assets/logo.png';
 import PlanMap from '@/pages/PlanMap';
-
-import {
-  DesktopOutlined,
-  PieChartOutlined,
-  FileOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-
 
 export interface MapLayoutProps extends ProLayoutProps {
   breadcrumbNameMap: {
