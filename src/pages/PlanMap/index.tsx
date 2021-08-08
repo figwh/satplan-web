@@ -1,11 +1,12 @@
 import { Button, Select } from 'antd';
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { useIntl, FormattedMessage } from 'umi';
+import { useIntl, Link,FormattedMessage } from 'umi';
 import { SatItem, SenItem, DataNode, PlanPara, SatSen, PathUnit, SenPath } from './data';
 import { querySatTree, querySensorPaths } from './service';
 import { Layout, Menu, Breadcrumb, Tree } from 'antd';
 const { Header, Content, Footer, Sider } = Layout;
-import './index.css';
+import styles from './index.css';
+import logo from '@/assets/logo.png';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { defaults as defaultControls } from 'ol/control';
@@ -244,7 +245,12 @@ const PlanMap: React.FC<{}> = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider >
-        <div className="logo" />
+        <div className={styles.header}>
+          <Link to="/">
+            <img alt="logo" className={styles.logo} src={logo} />
+            <span className={styles.title}>SatPlan</span>
+          </Link>
+        </div>
         <Tree className="sat-tree"
           checkable
           onExpand={onExpand}
@@ -261,14 +267,14 @@ const PlanMap: React.FC<{}> = () => {
       </Sider>
       <Layout className="site-layout">
         <Header className="site-layout-background" style={{ padding: 0 }}>
-          <span>Planning in next : </span>
+          <span style={{color: "white"}}>Planning in next : </span>
           <Select defaultValue="7" style={{ width: 120 }} onChange={e => {
             setPlanningDays(Number(e))
           }}>
             <Option value="1">1</Option>
             <Option value="2">2</Option>
           </Select>
-          <span>days</span>
+          <span style={{color: "white"}}>days</span>
           <Button type="primary">Draw Area</Button>
         </Header>
         <Content style={{ margin: '0 0px' }}>

@@ -1,6 +1,6 @@
 {
-  "name": "Toad-Web",
-  "short_name": "Toad-Web",
+  "name": "SatPlan-Web",
+  "short_name": "SatPlan-Web",
   "display": "standalone",
   "start_url": "./?utm_source=homescreen",
   "theme_color": "#002140",

@@ -1,9 +1,9 @@
 import { reloadAuthorized } from './Authorized';
 import { CurrentUser } from '../models/user';
 
-const TOKEN_KEY = 'toad-web-access-token'
-const AUTHORITY_KEY = 'toad-web-authority'
-const USER_DATA = 'toad-web-user-data'
+const TOKEN_KEY = 'SatPlan-web-access-token'
+const AUTHORITY_KEY = 'SatPlan-web-authority'
+const USER_DATA = 'SatPlan-web-user-data'
 // use localStorage to store the authority info, which might be sent from server in actual project.
 export function getAuthority(): string | string[] {
   let authorityString = localStorage.getItem(AUTHORITY_KEY);

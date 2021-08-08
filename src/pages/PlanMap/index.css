@@ -10,3 +10,13 @@
   [data-theme="dark"] .site-layout .site-layout-background {
     background: #141414;
   }
+  
+  .title {
+    position: relative;
+    top: 2px;
+    color: fade(#000,85%);
+    font-weight: 600;
+    font-size: 33px;
+    font-family: Avenir, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  }
+  

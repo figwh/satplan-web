@@ -46,7 +46,7 @@ const UserLayout: React.FC<UserLayoutProps> = (props) => {
             <div className={styles.header}>
               <Link to="/">
                 <img alt="logo" className={styles.logo} src={logo} />
-                <span className={styles.title}>Toad-Web</span>
+                <span className={styles.title}>SatPlan-Web</span>
               </Link>
             </div>
           </div>

@@ -13,7 +13,7 @@ const proSettings: DefaultSettings = {
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: 'Toad-Web',
+  title: 'SatPlan-Web',
   pwa: false,
   iconfontUrl: '',
 };
