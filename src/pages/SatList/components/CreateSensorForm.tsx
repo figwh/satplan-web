@@ -20,7 +20,6 @@ const CreateSensorForm: React.FC<CreateSensorFormProps> = (props) => {
   const intl = useIntl();
   const [form] = Form.useForm();
 
-  console.log(editingRecord)
   return (
     <ModalForm
       form={form}

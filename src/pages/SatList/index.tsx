@@ -135,7 +135,7 @@ const TableList: React.FC<{}> = () => {
         defaultMessage="HexColor" />,
       dataIndex: 'hexColor',
       render: (text, record, _, action) => [
-        <span style={{ backgroundColor: record.hexColor }}>{record.hexColor.toUpperCase()}</span>
+        <span key="color" style={{ backgroundColor: record.hexColor }}>{record.hexColor.toUpperCase()}</span>
       ]
     },
     {
@@ -211,7 +211,7 @@ const TableList: React.FC<{}> = () => {
             title: 'HexColor', dataIndex: 'hexColor',
             key: 'hexColor',
             render: (text, record, _, action) => [
-              <span style={{ backgroundColor: record.hexColor }}>{record.hexColor.toUpperCase()}</span>
+              <span key="color" style={{ backgroundColor: record.hexColor }}>{record.hexColor.toUpperCase()}</span>
             ]
           },
           {
@@ -428,7 +428,7 @@ const TableList: React.FC<{}> = () => {
         >
         </UpdateForm>
       ) : null}
-      {editingSen !== undefined ? (
+      {editingSen !== undefined || editingSat !== undefined ? (
         <CreateSensorForm
           satName={editingSat === undefined ? "" : editingSat.name}
           editingRecord={editingSen}
