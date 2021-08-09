@@ -53,6 +53,7 @@ export interface PathUnit {
   satId: string;
   satName: string;
   senName: string;
+  hexColor: string;
   start: number;
   stop: number;
   pathGeo: SenPath[];

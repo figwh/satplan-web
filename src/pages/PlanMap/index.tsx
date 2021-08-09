@@ -15,7 +15,6 @@ import MousePosition from 'ol/control/MousePosition';
 import { createStringXY } from 'ol/coordinate';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { CarryOutOutlined } from '@ant-design/icons';
 import Draw, {
   createBox,
   createRegularPolygon,
@@ -53,7 +52,7 @@ const PlanMap: React.FC<{}> = () => {
   const refSenIds = useRef<number[]>(checkedSenIds)
   const [draw, setDraw] = useState<Draw>();
   const [map, setMap] = useState<Map>();
-  const [area, setArea] = useState<olExtent.Extent>();
+  const [area, setArea] = useState<Geometry>();
   const [pathUnits, setPathUnits] = useState<PathUnit[]>();
   const { formatMessage } = useIntl();
 
@@ -77,15 +76,6 @@ const PlanMap: React.FC<{}> = () => {
   const pathSource = new VectorSource({ wrapX: false });
   const pathLayer = new VectorLayer({
     source: pathSource,
-    style: new Style({
-      stroke: new Stroke({
-        color: 'blue',
-        width: 3,
-      }),
-      fill: new Fill({
-        color: 'rgba(0, 0, 255, 0.1)',
-      }),
-    }),
   });
 
   const addInteraction = () => {
@@ -104,15 +94,15 @@ const PlanMap: React.FC<{}> = () => {
     map.removeInteraction(draw)
   }
 
-  const afterDrawed = (g: Geometry) => {
-    g.transform("EPSG:900913", "EPSG:4326")
-    setArea(g.getExtent())
-    let ext = g.getExtent()
+  const afterDrawed = (g: Geometry, senIds: number[], planningDays: number) => {
+    let clonedGeo = g.clone()
+    clonedGeo.transform("EPSG:900913", "EPSG:4326")
+    let ext = clonedGeo.getExtent()
     //query paths
     querySensorPaths({
-      checkedSenIds: refSenIds.current,
+      checkedSenIds: senIds,
       start: 1517512450,
-      stop: 1517512450 + 86400 * refPlanningDays.current,
+      stop: 1517512450 + 86400 * planningDays,
       xmin: ext[0],
       xmax: ext[2],
       ymin: ext[1],
@@ -122,7 +112,7 @@ const PlanMap: React.FC<{}> = () => {
       //draw area
       pathSource.clear()
       let leftPoints: number[][] = [], rightPoints: number[][] = []
-      let pathAreas: Polygon[] = []
+      let features: Feature<Geometry>[] = []
       e.dataList.forEach((u: PathUnit) => {
         leftPoints = []
         rightPoints = []
@@ -134,22 +124,30 @@ const PlanMap: React.FC<{}> = () => {
 
           let pathPoints = leftPoints.concat(rightPoints.reverse())
           pathPoints.push(leftPoints[0])
-          pathAreas.push(new Polygon([pathPoints]))
+          let polygon = new Polygon([pathPoints])
+          polygon.transform("EPSG:4326", "EPSG:900913")
+          let polygon_style = new Style({
+            stroke: new Stroke({
+              color: u.hexColor,
+              width: 1.5,
+            }),
+            fill: new Fill({
+              color: 'rgba(0, 0, 255, 0.1)',
+            }),
+          })
+
+          let fea = new Feature({
+            geometry: polygon,
+            attributes: { "satellite": u.satName, "sensor": u.senName, "starttime": u.start, "stoptime": u.stop }
+          })
+          fea.setStyle(polygon_style)
+          features.push(fea)
         }
       });
-      let features: Feature<Geometry>[] = []
-      pathAreas.forEach((p: Polygon) => {
-        let polygon = p.clone()
-        polygon.transform("EPSG:4326", "EPSG:900913")
-        features.push(new Feature({
-          geometry: polygon,
-          name: 'My Polygon'
-        }))
-      })
       pathSource.addFeatures(features)
     })
   }
-
+  
   useEffect(() => {
     if (refGraph.current == null) {
       return
@@ -167,7 +165,8 @@ const PlanMap: React.FC<{}> = () => {
     })
     draw.on('drawend', (evt) => {
       let bounds = evt.feature.getGeometry().clone()
-      afterDrawed(bounds)
+      setArea(bounds)
+      afterDrawed(bounds, refSenIds.current, refPlanningDays.current)
     })
 
     setMap(new Map({
@@ -192,7 +191,7 @@ const PlanMap: React.FC<{}> = () => {
 
   const rectSvg = () => (
     <svg width="100" height="100" fill="currentColor" strokeWidth="1" stroke="rgb(0,0,0)" viewBox="0 0 1024 1024">
-      <rect x="50" y="80" width="100" height="100"/>
+      <rect x="50" y="80" width="100" height="100" />
     </svg>
   );
 
@@ -207,14 +206,14 @@ const PlanMap: React.FC<{}> = () => {
             key: s.id.toString(),
             icon: <RectIcon style={{ color: s.hexColor }} />,
             isLeaf: true,
-          } 
+          }
         })
         return {
           title: a.name,
           key: a.noardId,
           isLeaf: false,
           children: sensors,
-        } 
+        }
       }) as DataNode[]
       setSatTree(res)
       if (res.length != 0) {
@@ -244,6 +243,10 @@ const PlanMap: React.FC<{}> = () => {
     })
     setCheckedKeys(checkedKeysValue);
     setCheckedSenIds(senIds)
+
+    if (area != undefined && senIds.length != 0) {
+      afterDrawed(area, senIds, refPlanningDays.current)
+    }
   };
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
