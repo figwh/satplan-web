@@ -28,6 +28,7 @@ import Polygon from 'ol/geom/Polygon';
 import Geometry from 'ol/geom/Geometry';
 import Point from 'ol/geom/Point';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
+import { DragPan, MouseWheelZoom, defaults } from 'ol/interaction';
 const { Option } = Select;
 
 //TODO
@@ -52,12 +53,14 @@ const PlanMap: React.FC<{}> = () => {
   const refSenIds = useRef<number[]>(checkedSenIds)
   const [draw, setDraw] = useState<Draw>();
   const [map, setMap] = useState<Map>();
+  const refMap = useRef<Map>()
   const [area, setArea] = useState<Geometry>();
   const [pathUnits, setPathUnits] = useState<PathUnit[]>();
   const { formatMessage } = useIntl();
 
   refSenIds.current = checkedSenIds
   refPlanningDays.current = planningDays
+  refMap.current = map
 
   const mousePositionControl = new MousePosition({
     coordinateFormat: createStringXY(4),
@@ -78,20 +81,17 @@ const PlanMap: React.FC<{}> = () => {
     source: pathSource,
   });
 
-  const addInteraction = () => {
-    if (map === undefined) { return }
-    setDraw(new Draw({
-      source: areaSource,
-      type: "Circle",
-      geometryFunction: createBox()
-    }));
-    if (draw === undefined) { return }
-    map.addInteraction(draw);
+  const switchToPan = () => {
+    if (refMap.current === undefined) {
+      console.log('undefined, return')
+      return
+    }
+    refMap.current.removeInteraction(drawTool)
   }
 
-  const switchToPan = () => {
-    if (map === undefined || draw === undefined) { return }
-    map.removeInteraction(draw)
+  const setAsDrawTool = () => {
+    if (refMap.current === undefined) { return }
+    refMap.current.addInteraction(drawTool)
   }
 
   const afterDrawed = (g: Geometry, senIds: number[], planningDays: number) => {
@@ -145,13 +145,13 @@ const PlanMap: React.FC<{}> = () => {
         }
       });
       pathSource.addFeatures(features)
+
+      switchToPan()
     })
   }
-  
-  useEffect(() => {
-    if (refGraph.current == null) {
-      return
-    }
+
+  const drawTool = useMemo(() => {
+    console.log('draw')
     let draw = new Draw({
       source: areaSource,
       type: "Circle",
@@ -168,10 +168,17 @@ const PlanMap: React.FC<{}> = () => {
       setArea(bounds)
       afterDrawed(bounds, refSenIds.current, refPlanningDays.current)
     })
+    return draw
+  }, [])
+
+  useEffect(() => {
+    if (refGraph.current == null) {
+      return
+    }
 
     setMap(new Map({
       target: refGraph.current,
-      interactions: [draw],
+      interactions: defaults({ dragPan: true, mouseWheelZoom: true }),
       layers: [
         new TileLayer({
           source: new XYZ({
@@ -298,7 +305,7 @@ const PlanMap: React.FC<{}> = () => {
             <Option value="7">7</Option>
           </Select>
           <span style={{ color: "white" }}>days</span>
-          <Button type="primary">Draw Area</Button>
+          <Button type="primary" onClick={setAsDrawTool}>Draw Area</Button>
         </Header>
         <Content style={{ margin: '0 0px' }}>
           <div ref={refGraph} className="map" id="map" style={{ width: '100%', height: '100vh' }}></div>
