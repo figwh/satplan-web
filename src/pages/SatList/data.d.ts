@@ -6,14 +6,14 @@ export interface NewSatParam {
 
 export interface UpdateSatParam {
   satName: string;
-  hexColor: number;
+  hexColor: string;
 }
 
 export interface SatListItem {
   id: number;
   name: string;
   noardId: string;
-  hexColor: number;
+  hexColor: string;
   senItems: SenItemInfo[];
 }
 
@@ -26,7 +26,17 @@ export interface SenItemInfo {
   leftSideAngle: number;
   observeAngle: number;
   initAngle: number;
-  hexColor: number;
+  hexColor: string;
 }
 
-
+export interface NewSenParam {
+  satId: string;
+  name: string;
+  resolution: number;
+  width: number;
+  rightSideAngle: number;
+  leftSideAngle: number;
+  observeAngle: number;
+  initAngle: number;
+  hexColor: string;
+}

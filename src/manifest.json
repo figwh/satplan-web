@@ -1,6 +1,6 @@
 {
-  "name": "SatPlan-Web",
-  "short_name": "SatPlan-Web",
+  "name": "Satellite Planning",
+  "short_name": "SatPlan",
   "display": "standalone",
   "start_url": "./?utm_source=homescreen",
   "theme_color": "#002140",

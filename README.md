@@ -1,3 +1,3 @@
-# SatPlan-web
+# Satellite planning
 
-SatPlan
+frontend

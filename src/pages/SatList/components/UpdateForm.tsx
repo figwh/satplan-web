@@ -2,6 +2,9 @@ import React from 'react';
 import { ModalForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { useIntl, FormattedMessage } from 'umi';
 import { UpdateSatParam, SatListItem } from '../data';
+import { CompactPicker } from 'react-color';
+import { Form } from 'antd'
+import ColorButton from './colorButton'
 
 interface UpdateFormProps {
   modalVisible: boolean;
@@ -30,7 +33,10 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       }}
       onFinish={(value) => {
         return new Promise((resolve) => {
-          onOk(editingRecord, value as UpdateSatParam)
+          onOk(editingRecord, {
+            satName: value.satName,
+            hexColor: editingRecord.hexColor,
+          } as UpdateSatParam)
           resolve()
         })
       }}
@@ -60,24 +66,11 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         placeholder="卫星名"
         initialValue={editingRecord.name}
       />
-      <ProFormText
-        rules={[
-          {
-            required: true,
-            message: (
-              <FormattedMessage
-                id="pages.satTable.oleColorRule"
-                defaultMessage="请输入颜色"
-              />
-            ),
-          },
-        ]}
-        width="md"
-        name="hexColor"
-        initialValue={editingRecord.hexColor}
-        label="颜色"
-        placeholder="颜色"
-      />
+      <Form.Item name="satColor" label="颜色">
+        <ColorButton initColor={editingRecord.hexColor} onValueChanged={(c) => {
+          editingRecord.hexColor = c
+        }} />
+      </Form.Item>
     </ModalForm>
   );
 };

@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-import { NewSatParam, UpdateSatParam } from './data';
+import { NewSatParam, UpdateSatParam, NewSenParam } from './data';
 
 export async function querySat() {
   const data = await request('/api/sat/all');
@@ -53,5 +53,14 @@ export async function removeSen(senId: number) {
 export async function updateTles() {
   return request(`/api/sat/tle/update`, {
     method: 'POST'
+  });
+}
+
+export async function addSen(params: NewSenParam) {
+  return request('/api/sen/add', {
+    method: 'POST',
+    data: {
+      ...params,
+    },
   });
 }

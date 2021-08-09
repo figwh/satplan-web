@@ -6,9 +6,10 @@ import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProDescriptions, { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import UpdateForm from './components/UpdateForm';
 import CreateForm from './components/CreateForm';
-import { NewSatParam, SatListItem, UpdateSatParam, } from './data';
+import CreateSensorForm from './components/CreateSensorForm';
+import { NewSatParam, SatListItem, UpdateSatParam, NewSenParam } from './data';
 import { ReloadOutlined, PlusOutlined, WarningOutlined } from '@ant-design/icons';
-import { querySat, updateSat,updateTles, addSat, batRemoveSat, removeSat, removeSen } from './service';
+import { querySat, updateSat, updateTles, addSat, addSen, batRemoveSat, removeSat, removeSen } from './service';
 import { getUserData } from '../../utils/authority'
 import { CurrentUser } from '../../models/user'
 
@@ -29,6 +30,19 @@ const handleAdd = async (fields: NewSatParam) => {
   }
 };
 
+const handleAddSen = async (fields: NewSenParam) => {
+  const hide = message.loading('正在添加');
+  try {
+    await addSen(fields);
+    hide;
+    message.success('添加成功');
+    return true;
+  } catch (error) {
+    hide;
+    message.error('添加失败，请重试！');
+    return false;
+  }
+}
 /**
 * 更新卫星
 * @param fields
@@ -63,6 +77,7 @@ const TableList: React.FC<{}> = () => {
    * 新建窗口的弹窗
    */
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
+  const [createSenModalVisible, handleSenModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   const [editingRecord, setEditingRecord] = useState<SatListItem | undefined>(undefined);
   const [keyword, setKeyword] = useState<string>('');
@@ -95,9 +110,12 @@ const TableList: React.FC<{}> = () => {
       dataIndex: 'noardId',
     },
     {
-      title: <FormattedMessage id="pages.satTable.satItem.oleColorLabel"
+      title: <FormattedMessage id="pages.satTable.satItem.hexColorLabel"
         defaultMessage="HexColor" />,
       dataIndex: 'hexColor',
+      render: (text, record, _, action) => [
+        <span style={{ backgroundColor: record.hexColor }}>{record.hexColor.toUpperCase()}</span>
+      ]
     },
     {
       title: '操作',
@@ -115,7 +133,7 @@ const TableList: React.FC<{}> = () => {
         <a
           key="addsen"
           onClick={() => {
-            handleUpdateModalVisible(true);
+            handleSenModalVisible(true)
             setEditingRecord(record)
           }}
         >
@@ -168,7 +186,13 @@ const TableList: React.FC<{}> = () => {
           { title: '左侧摆角', dataIndex: 'leftSideAngle', key: 'leftSideAngle' },
           { title: '右侧摆角', dataIndex: 'rightSideAngle', key: 'rightSideAngle' },
           { title: '安装角', dataIndex: 'initAngle', key: 'initAngle' },
-          { title: 'HexColor', dataIndex: 'hexColor', key: 'hexColor' },
+          {
+            title: 'HexColor', dataIndex: 'hexColor',
+            key: 'hexColor',
+            render: (text, record, _, action) => [
+              <span style={{ backgroundColor: record.hexColor }}>{record.hexColor.toUpperCase()}</span>
+            ]
+          },
           {
             title: '操作',
             valueType: 'option',
@@ -244,7 +268,7 @@ const TableList: React.FC<{}> = () => {
             <Button
               icon={<ReloadOutlined />}
               style={{ marginRight: 8 }}
-              onClick={ async () => {
+              onClick={async () => {
                 const hide = message.loading('正在更新');
                 try {
                   await updateTles();
@@ -382,6 +406,26 @@ const TableList: React.FC<{}> = () => {
         >
         </UpdateForm>
       ) : null}
+      <CreateSensorForm
+        satName={editingRecord===undefined?"":editingRecord.name}
+        modalVisible={createSenModalVisible}
+        onCancel={() => handleSenModalVisible(false)}
+        onOk={async (value) => {
+          console.log(value)
+          const success = await handleAddSen({
+            ...value,
+            satId: editingRecord === undefined ? "" : editingRecord.noardId
+          } as NewSenParam);
+          if (success) {
+            handleSenModalVisible(false);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          }
+          return success
+        }}
+      >
+      </CreateSensorForm>
 
       <Drawer
         width={600}
