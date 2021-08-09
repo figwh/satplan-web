@@ -33,6 +33,8 @@ import { DragPan, MouseWheelZoom, defaults } from 'ol/interaction';
 import Select from 'ol/interaction/Select';
 import { click } from 'ol/events/condition';
 import Overlay from 'ol/Overlay';
+import * as dayjs from 'dayjs'
+
 const { Option } = AntSelect;
 
 //TODO
@@ -140,9 +142,13 @@ const PlanMap: React.FC<{}> = () => {
       }
       const coordinate = getCenter(e.selected[0].getGeometry().getExtent())
       const attr = e.selected[0].get("attributes")
+      if (attr === undefined) {
+        return
+      }
       refContent.current.innerHTML = "<div style='font-size:.8em'>Satellite: " +
         attr["satellite"] + "<br>Sensor: " + attr["sensor"] + "<br>StartTime: " +
-        attr["starttime"] + "<br>StopTime: " + attr["stoptime"] + "</div>";
+        dayjs.unix(attr["starttime"]).format("YYYY-MM-DD HH:mm:ss UTC")
+        + "<br>StopTime: " + dayjs.unix(attr["stoptime"]).format("YYYY-MM-DD HH:mm:ss UTC") + "</div>";
 
       refMap.current.getOverlayById("popup").setPosition(coordinate);
     })
@@ -364,7 +370,7 @@ const PlanMap: React.FC<{}> = () => {
             <Option value="6">6</Option>
             <Option value="7">7</Option>
           </AntSelect>
-          <span style={{ color: "white" }}>days</span>
+          <span style={{ color: "white" }}>days    </span>
           <Button type="primary" onClick={setAsDrawTool}>Draw Area</Button>
         </Header>
         <Content style={{ margin: '0 0px' }}>
