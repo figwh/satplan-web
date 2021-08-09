@@ -2,7 +2,7 @@ export interface SatItem {
   id: number;
   name: string;
   noardId: string;
-  oleColor: number;
+  hexColor: string;
   senItems: SenItem[];
 }
 
@@ -15,7 +15,7 @@ export interface SenItem {
   leftSideAngle: number;
   observeAngle: number;
   initAngle: number;
-  oleColor: number;
+  hexColor: string;
 }
 
 export interface DataNode {

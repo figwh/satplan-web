@@ -1,6 +1,7 @@
 import { Button, Select } from 'antd';
+import Icon from '@ant-design/icons';
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { useIntl, Link,FormattedMessage } from 'umi';
+import { useIntl, Link, FormattedMessage } from 'umi';
 import { SatItem, SenItem, DataNode, PlanPara, SatSen, PathUnit, SenPath } from './data';
 import { querySatTree, querySensorPaths } from './service';
 import { Layout, Menu, Breadcrumb, Tree } from 'antd';
@@ -14,6 +15,7 @@ import MousePosition from 'ol/control/MousePosition';
 import { createStringXY } from 'ol/coordinate';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
+import { CarryOutOutlined } from '@ant-design/icons';
 import Draw, {
   createBox,
   createRegularPolygon,
@@ -188,24 +190,36 @@ const PlanMap: React.FC<{}> = () => {
     }));
   }, []);
 
+  const rectSvg = () => (
+    <svg width="100" height="100" fill="currentColor" strokeWidth="1" stroke="rgb(0,0,0)" viewBox="0 0 1024 1024">
+      <rect x="50" y="80" width="100" height="100"/>
+    </svg>
+  );
+
+  const RectIcon = props => <Icon component={rectSvg} {...props} />;
+
   const getSatTree = async () => {
     querySatTree().then(e => {
       let res = e.dataList?.map((a: SatItem) => {
         let sensors = a.senItems.map((s: SenItem) => {
           return {
             title: s.name,
-            key: s.id,
+            key: s.id.toString(),
+            icon: <RectIcon style={{ color: s.hexColor }} />,
             isLeaf: true,
-          }
+          } 
         })
         return {
           title: a.name,
           key: a.noardId,
           isLeaf: false,
           children: sensors,
-        }
-      })
+        } 
+      }) as DataNode[]
       setSatTree(res)
+      if (res.length != 0) {
+        setExpandedKeys([res[0].key])
+      }
     })
   }
 
@@ -258,6 +272,7 @@ const PlanMap: React.FC<{}> = () => {
           autoExpandParent={autoExpandParent}
           onCheck={onCheck}
           checkedKeys={checkedKeys}
+          showIcon={true}
           //onSelect={onSelect}
           selectedKeys={selectedKeys}
           treeData={satTree}
@@ -267,7 +282,7 @@ const PlanMap: React.FC<{}> = () => {
       </Sider>
       <Layout className="site-layout">
         <Header className="site-layout-background" style={{ padding: 0 }}>
-          <span style={{color: "white"}}>Planning in next : </span>
+          <span style={{ color: "white" }}>Planning in next : </span>
           <Select defaultValue="3" style={{ width: 120 }} onChange={e => {
             setPlanningDays(Number(e))
           }}>
@@ -279,7 +294,7 @@ const PlanMap: React.FC<{}> = () => {
             <Option value="6">6</Option>
             <Option value="7">7</Option>
           </Select>
-          <span style={{color: "white"}}>days</span>
+          <span style={{ color: "white" }}>days</span>
           <Button type="primary">Draw Area</Button>
         </Header>
         <Content style={{ margin: '0 0px' }}>

@@ -143,7 +143,7 @@ export default {
   'pages.userSettings.newPasswordRule':'Please select new password',
   'pages.satTable.satItem.nameLabel': 'Name',
   'pages.satTable.satItem.noardIdLabel': 'NoardID',
-  'pages.satTable.satItem.oleColorLabel': 'OleColor',
+  'pages.satTable.satItem.oleColorLabel': 'HexColor',
   'pages.satTable.satItem.action': 'Action',
   'pages.satTable.satItem.edit': 'Edit',
   'pages.satTable.satItem.delete': 'Delete',

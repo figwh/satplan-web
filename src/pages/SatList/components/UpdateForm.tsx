@@ -73,8 +73,8 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
           },
         ]}
         width="md"
-        name="oleColor"
-        initialValue={editingRecord.oleColor}
+        name="hexColor"
+        initialValue={editingRecord.hexColor}
         label="颜色"
         placeholder="颜色"
       />

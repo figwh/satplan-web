@@ -96,8 +96,8 @@ const TableList: React.FC<{}> = () => {
     },
     {
       title: <FormattedMessage id="pages.satTable.satItem.oleColorLabel"
-        defaultMessage="OleColor" />,
-      dataIndex: 'oleColor',
+        defaultMessage="HexColor" />,
+      dataIndex: 'hexColor',
     },
     {
       title: '操作',
@@ -168,7 +168,7 @@ const TableList: React.FC<{}> = () => {
           { title: '左侧摆角', dataIndex: 'leftSideAngle', key: 'leftSideAngle' },
           { title: '右侧摆角', dataIndex: 'rightSideAngle', key: 'rightSideAngle' },
           { title: '安装角', dataIndex: 'initAngle', key: 'initAngle' },
-          { title: 'OleColor', dataIndex: 'oleColor', key: 'oleColor' },
+          { title: 'HexColor', dataIndex: 'hexColor', key: 'hexColor' },
           {
             title: '操作',
             valueType: 'option',
