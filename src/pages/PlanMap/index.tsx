@@ -1,4 +1,4 @@
-import { Button, Select } from 'antd';
+import { Button, Select as AntSelect } from 'antd';
 import Icon from '@ant-design/icons';
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useIntl, Link, FormattedMessage } from 'umi';
@@ -15,6 +15,7 @@ import MousePosition from 'ol/control/MousePosition';
 import { createStringXY } from 'ol/coordinate';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
+import { getCenter } from 'ol/extent';
 import Draw, {
   createBox,
   createRegularPolygon,
@@ -29,7 +30,10 @@ import Geometry from 'ol/geom/Geometry';
 import Point from 'ol/geom/Point';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
 import { DragPan, MouseWheelZoom, defaults } from 'ol/interaction';
-const { Option } = Select;
+import Select from 'ol/interaction/Select';
+import { click } from 'ol/events/condition';
+import Overlay from 'ol/Overlay';
+const { Option } = AntSelect;
 
 //TODO
 /*
@@ -50,6 +54,9 @@ const PlanMap: React.FC<{}> = () => {
   const refPlanningDays = useRef<number>(planningDays)
   const [satTree, setSatTree] = useState<DataNode[]>()
   const refGraph = useRef<HTMLDivElement>(null)
+  const refCloser = useRef<HTMLAnchorElement>(null)
+  const refContainer = useRef<HTMLDivElement>(null)
+  const refContent = useRef<HTMLDivElement>(null)
   const refSenIds = useRef<number[]>(checkedSenIds)
   const [draw, setDraw] = useState<Draw>();
   const [map, setMap] = useState<Map>();
@@ -81,16 +88,70 @@ const PlanMap: React.FC<{}> = () => {
     source: pathSource,
   });
 
-  const switchToPan = () => {
+  const overlay = useMemo(() => {
+    if (refContainer.current == null) {
+      return undefined
+    }
+    return new Overlay({
+      element: refContainer.current,
+      autoPan: true,
+      autoPanAnimation: {
+        duration: 250,
+      },
+    })
+  }, [refContainer.current]);
+
+  useEffect(() => {
+    if (refContainer.current == null || refMap.current == undefined) { return }
+    const overlay = new Overlay({
+      id: "popup",
+      element: refContainer.current,
+      autoPan: true,
+      autoPanAnimation: {
+        duration: 250,
+      },
+    })
+    refMap.current.addOverlay(overlay)
+  }, [refContainer.current])
+
+  const onPopupCloserClick = function () {
+    if (refCloser.current == null || refMap.current === undefined) {
+      return
+    }
+    refMap.current.getOverlayById("popup").setPosition(undefined);
+    refCloser.current.blur();
+    return false;
+  };
+
+  const selectFeature = new Select({
+    condition: click,
+  });
+
+  const switchToSelect = () => {
     if (refMap.current === undefined) {
-      console.log('undefined, return')
       return
     }
     refMap.current.removeInteraction(drawTool)
+    selectFeature.on('select', function (e) {
+      if (refContent.current == null || refMap.current == null ||
+        e.selected.length == 0) {
+        onPopupCloserClick()
+        return
+      }
+      const coordinate = getCenter(e.selected[0].getGeometry().getExtent())
+      const attr = e.selected[0].get("attributes")
+      refContent.current.innerHTML = "<div style='font-size:.8em'>Satellite: " +
+        attr["satellite"] + "<br>Sensor: " + attr["sensor"] + "<br>StartTime: " +
+        attr["starttime"] + "<br>StopTime: " + attr["stoptime"] + "</div>";
+
+      refMap.current.getOverlayById("popup").setPosition(coordinate);
+    })
+    refMap.current.addInteraction(selectFeature)
   }
 
   const setAsDrawTool = () => {
     if (refMap.current === undefined) { return }
+    refMap.current.removeInteraction(selectFeature)
     refMap.current.addInteraction(drawTool)
   }
 
@@ -146,12 +207,11 @@ const PlanMap: React.FC<{}> = () => {
       });
       pathSource.addFeatures(features)
 
-      switchToPan()
+      switchToSelect()
     })
   }
 
   const drawTool = useMemo(() => {
-    console.log('draw')
     let draw = new Draw({
       source: areaSource,
       type: "Circle",
@@ -293,7 +353,7 @@ const PlanMap: React.FC<{}> = () => {
       <Layout className="site-layout">
         <Header className="site-layout-background" style={{ padding: 0 }}>
           <span style={{ color: "white" }}>Planning in next : </span>
-          <Select defaultValue="3" style={{ width: 120 }} onChange={e => {
+          <AntSelect defaultValue="3" style={{ width: 120 }} onChange={e => {
             setPlanningDays(Number(e))
           }}>
             <Option value="1">1</Option>
@@ -303,13 +363,18 @@ const PlanMap: React.FC<{}> = () => {
             <Option value="5">5</Option>
             <Option value="6">6</Option>
             <Option value="7">7</Option>
-          </Select>
+          </AntSelect>
           <span style={{ color: "white" }}>days</span>
           <Button type="primary" onClick={setAsDrawTool}>Draw Area</Button>
         </Header>
         <Content style={{ margin: '0 0px' }}>
           <div ref={refGraph} className="map" id="map" style={{ width: '100%', height: '100vh' }}></div>
         </Content>
+        <div ref={refContainer} id="popup" className={styles.olPopup}>
+          <a href="#" ref={refCloser} onClick={onPopupCloserClick} id="popup-closer"
+            className={styles.olPopupCloser}></a>
+          <div ref={refContent} id="popup-content"></div>
+        </div>
       </Layout>
     </Layout>
   );
