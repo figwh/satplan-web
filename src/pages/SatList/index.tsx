@@ -7,9 +7,15 @@ import ProDescriptions, { ProDescriptionsItemProps } from '@ant-design/pro-descr
 import UpdateForm from './components/UpdateForm';
 import CreateForm from './components/CreateForm';
 import CreateSensorForm from './components/CreateSensorForm';
-import { NewSatParam, SatListItem, UpdateSatParam, NewSenParam } from './data';
+import {
+  NewSatParam, SatListItem, UpdateSatParam,
+  NewSenParam, SenItemInfo, UpdateSenParam
+} from './data';
 import { ReloadOutlined, PlusOutlined, WarningOutlined } from '@ant-design/icons';
-import { querySat, updateSat, updateTles, addSat, addSen, batRemoveSat, removeSat, removeSen } from './service';
+import {
+  querySat, updateSat, updateTles, addSat, addSen, updateSen,
+  batRemoveSat, removeSat, removeSen
+} from './service';
 import { getUserData } from '../../utils/authority'
 import { CurrentUser } from '../../models/user'
 
@@ -29,6 +35,20 @@ const handleAdd = async (fields: NewSatParam) => {
     return false;
   }
 };
+
+const handleEditSen = async (senId: number, fields: UpdateSenParam) => {
+  const hide = message.loading('正在更新');
+  try {
+    await updateSen(senId, fields);
+    hide;
+    message.success('添加成功');
+    return true;
+  } catch (error) {
+    hide;
+    message.error('添加失败，请重试！');
+    return false;
+  }
+}
 
 const handleAddSen = async (fields: NewSenParam) => {
   const hide = message.loading('正在添加');
@@ -79,7 +99,8 @@ const TableList: React.FC<{}> = () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [createSenModalVisible, handleSenModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-  const [editingRecord, setEditingRecord] = useState<SatListItem | undefined>(undefined);
+  const [editingSat, setEditingSat] = useState<SatListItem | undefined>(undefined);
+  const [editingSen, setEditingSen] = useState<SenItemInfo | undefined>(undefined);
   const [keyword, setKeyword] = useState<string>('');
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
@@ -125,7 +146,7 @@ const TableList: React.FC<{}> = () => {
           key="editable"
           onClick={() => {
             handleUpdateModalVisible(true);
-            setEditingRecord(record)
+            setEditingSat(record)
           }}
         >
           编辑
@@ -134,7 +155,7 @@ const TableList: React.FC<{}> = () => {
           key="addsen"
           onClick={() => {
             handleSenModalVisible(true)
-            setEditingRecord(record)
+            setEditingSat(record)
           }}
         >
           添加载荷
@@ -200,8 +221,9 @@ const TableList: React.FC<{}> = () => {
               <a
                 key="editable"
                 onClick={() => {
-                  handleUpdateModalVisible(true);
-                  //setEditingRecord(record)
+                  setEditingSen(record)
+                  setEditingSat(row)
+                  handleSenModalVisible(true);
                 }}
               >
                 编辑
@@ -389,43 +411,61 @@ const TableList: React.FC<{}> = () => {
         }}
       >
       </CreateForm>
-      {editingRecord !== undefined ? (
+      {editingSat !== undefined ? (
         <UpdateForm
           modalVisible={updateModalVisible}
           onCancel={() => {
             handleModalVisible(false)
-            setEditingRecord(undefined)
+            setEditingSat(undefined)
           }}
-          editingRecord={editingRecord}
-          onOk={async (editingRecord, value) => {
-            const success = await handleUpdate(editingRecord, value as UpdateSatParam);
+          editingRecord={editingSat}
+          onOk={async (editingSat, value) => {
+            const success = await handleUpdate(editingSat, value as UpdateSatParam);
             if (success) {
-              setEditingRecord(undefined);
+              setEditingSat(undefined);
             }
           }}
         >
         </UpdateForm>
       ) : null}
-      <CreateSensorForm
-        satName={editingRecord===undefined?"":editingRecord.name}
-        modalVisible={createSenModalVisible}
-        onCancel={() => handleSenModalVisible(false)}
-        onOk={async (value) => {
-          console.log(value)
-          const success = await handleAddSen({
-            ...value,
-            satId: editingRecord === undefined ? "" : editingRecord.noardId
-          } as NewSenParam);
-          if (success) {
-            handleSenModalVisible(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
+      {editingSen !== undefined ? (
+        <CreateSensorForm
+          satName={editingSat === undefined ? "" : editingSat.name}
+          editingRecord={editingSen}
+          modalVisible={createSenModalVisible}
+          onCancel={() => {
+            handleSenModalVisible(false)
+            setEditingSat(undefined)
+          }}
+          onOk={async (value) => {
+            let success = false
+            if (editingSen === undefined) {
+              //add sen
+              success = await handleAddSen({
+                ...value,
+                satId: editingSat === undefined ? "" : editingSat.noardId
+              } as NewSenParam);
+            } else {
+              //update sen
+              success = await handleEditSen(
+                editingSen.id,
+                {
+                  ...value
+                } as UpdateSenParam);
             }
-          }
-          return success
-        }}
-      >
-      </CreateSensorForm>
+            if (success) {
+              handleSenModalVisible(false);
+              setEditingSat(undefined)
+              setEditingSen(undefined)
+              if (actionRef.current) {
+                actionRef.current.reload();
+              }
+            }
+            return success
+          }}
+        >
+        </CreateSensorForm>
+      ) : null}
 
       <Drawer
         width={600}

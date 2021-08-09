@@ -40,3 +40,14 @@ export interface NewSenParam {
   initAngle: number;
   hexColor: string;
 }
+
+export interface UpdateSenParam{
+  name: string;
+  resolution: number;
+  width: number;
+  rightSideAngle: number;
+  leftSideAngle: number;
+  observeAngle: number;
+  initAngle: number;
+  hexColor: string;
+}

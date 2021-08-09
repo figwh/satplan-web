@@ -1,24 +1,26 @@
-import { ModalForm, ProFormTextArea,ProFormDigit, ProFormText } from '@ant-design/pro-form';
+import { ModalForm, ProFormTextArea, ProFormDigit, ProFormText } from '@ant-design/pro-form';
 import { useIntl, FormattedMessage } from 'umi';
-import { NewSenParam } from '../data';
+import { NewSenParam, SenItemInfo, UpdateSenParam } from '../data';
 import { Modal, Form, Input, Checkbox, Select } from 'antd'
 import ProForm from '@ant-design/pro-form';
 import ColorButton from './colorButton'
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 
 interface CreateSensorFormProps {
+  editingRecord: SenItemInfo | undefined;
   satName: string;
   modalVisible: boolean;
   onCancel: () => void;
-  onOk: (value: NewSenParam) => Promise<boolean>;
+  onOk: (value: NewSenParam | UpdateSenParam) => Promise<boolean>;
 }
 
 const CreateSensorForm: React.FC<CreateSensorFormProps> = (props) => {
-  const { satName, modalVisible, onCancel, onOk } = props;
+  const { editingRecord, satName, modalVisible, onCancel, onOk } = props;
   const [senColor, setSenColor] = useState<string>("#000000")
   const intl = useIntl();
   const [form] = Form.useForm();
 
+  console.log(editingRecord)
   return (
     <ModalForm
       form={form}
@@ -36,11 +38,17 @@ const CreateSensorForm: React.FC<CreateSensorFormProps> = (props) => {
         onCancel: onCancel
       }}
       onFinish={async (value) => {
-        console.log(value)
-        onOk({
-          hexColor: senColor,
-          ...value
-        } as NewSenParam).then(() => { form.resetFields() })
+        if (editingRecord === undefined) {
+          onOk({
+            hexColor: senColor,
+            ...value
+          } as NewSenParam).then(() => { form.resetFields() })
+        } else {
+          onOk({
+            hexColor: senColor,
+            ...value
+          } as UpdateSenParam).then(() => { form.resetFields() })
+        }
       }}
     >
       <ProForm.Group>
@@ -57,49 +65,51 @@ const CreateSensorForm: React.FC<CreateSensorFormProps> = (props) => {
           name="name"
           label="载荷名"
           placeholder="载荷名"
+          initialValue={editingRecord === undefined ? "" : editingRecord.name}
           required={true}
         />
         <ProFormDigit
           width="sm"
           name="resolution"
           label="分辨率"
-          initialValue={0}
           placeholder="分辨率"
+          initialValue={editingRecord === undefined ? 0 : editingRecord.resolution}
           required={true}
         />
         <ProFormDigit
           width="sm"
           name="width"
           label="幅宽"
-          initialValue={0}
           placeholder="幅宽"
+          initialValue={editingRecord === undefined ? 0 : editingRecord.width}
           required={true}
         />
         <ProFormDigit
           width="sm"
           name="leftSideAngle"
           label="左侧摆角"
-          initialValue={0}
           placeholder="左侧摆角"
+          initialValue={editingRecord === undefined ? 0 : editingRecord.leftSideAngle}
         />
         <ProFormDigit
           width="sm"
           name="rightSideAngle"
           label="右侧摆角"
-          initialValue={0}
           placeholder="右侧摆角"
+          initialValue={editingRecord === undefined ? 0 : editingRecord.rightSideAngle}
         />
         <ProFormDigit
           width="sm"
           name="initAngle"
           label="安装角"
-          initialValue={0}
           placeholder="安装角"
+          initialValue={editingRecord === undefined ? 0 : editingRecord.initAngle}
         />
         <Form.Item name="satColor" label="颜色">
-          <ColorButton initColor={"#FFFFFF"} onValueChanged={(c) => {
-            setSenColor(c)
-          }} />
+          <ColorButton initColor={editingRecord === undefined ? "#FFFFFF" : editingRecord.hexColor}
+            onValueChanged={(c) => {
+              setSenColor(c)
+            }} />
         </Form.Item>
       </ProForm.Group>
     </ModalForm>
