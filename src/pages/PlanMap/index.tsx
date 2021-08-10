@@ -166,10 +166,11 @@ const PlanMap: React.FC<{}> = () => {
     clonedGeo.transform("EPSG:900913", "EPSG:4326")
     let ext = clonedGeo.getExtent()
     //query paths
+    let startTime = Math.floor(Date.now() / 1000)
     querySensorPaths({
       checkedSenIds: senIds,
-      start: 1517512450,
-      stop: 1517512450 + 86400 * planningDays,
+      start: startTime,
+      stop: startTime + 86400 * planningDays,
       xmin: ext[0],
       xmax: ext[2],
       ymin: ext[1],
