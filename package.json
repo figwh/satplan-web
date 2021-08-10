@@ -65,6 +65,7 @@
     "github-markdown-css": "^4.0.0",
     "lodash": "^4.17.11",
     "markdown-navbar": "^1.4.3",
+    "ol": "^6.6.1",
     "omit.js": "^2.0.2",
     "qs": "^6.9.0",
     "react": "^17.0.0",
