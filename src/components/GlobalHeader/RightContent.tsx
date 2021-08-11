@@ -29,6 +29,7 @@ const GlobalHeaderRight: React.SFC<GlobalHeaderRightProps> = (props) => {
   return (
     <div className={className}>
       <Avatar menu={true} />
+      <SelectLang className={styles.action} />
     </div>
   );
 };

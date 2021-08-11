@@ -16,86 +16,76 @@ import {
   querySat, updateSat, updateTles, addSat, addSen, updateSen,
   batRemoveSat, removeSat, removeSen
 } from './service';
-import { getUserData } from '../../utils/authority'
-import { CurrentUser } from '../../models/user'
 
 const { confirm } = Modal;
 const { Search } = Input
 
 const handleAdd = async (fields: NewSatParam) => {
-  const hide = message.loading('正在添加');
+  const { formatMessage } = useIntl();
+  const hide = message.loading(formatMessage({id:"pages.satTable.satItem.adding"}))
   try {
     await addSat(fields);
     hide;
-    message.success('添加成功');
+    message.success(formatMessage({id:"pages.satTable.satItem.addSuccess"}));
     return true;
   } catch (error) {
     hide;
-    message.error('添加失败，请重试！');
+    message.error(formatMessage({id:"pages.satTable.satItem.addFailed"}));
     return false;
   }
 };
 
 const handleEditSen = async (senId: number, fields: UpdateSenParam) => {
-  const hide = message.loading('正在更新');
+  const { formatMessage } = useIntl();
+  const hide = message.loading(formatMessage({id:"pages.satTable.satItem.updating"}));
   try {
     await updateSen(senId, fields);
     hide;
-    message.success('添加成功');
+    message.success(formatMessage({id:"pages.satTable.satItem.updateSuccess"}));
     return true;
   } catch (error) {
     hide;
-    message.error('添加失败，请重试！');
+    message.error(formatMessage({id:"pages.satTable.satItem.updateFailed"}));
     return false;
   }
 }
 
 const handleAddSen = async (fields: NewSenParam) => {
-  const hide = message.loading('正在添加');
+  const { formatMessage } = useIntl();
+  const hide = message.loading(formatMessage({id:"pages.satTable.satItem.adding"}));
   try {
     await addSen(fields);
     hide;
-    message.success('添加成功');
+    message.success(formatMessage({id:"pages.satTable.satItem.addSuccess"}));
     return true;
   } catch (error) {
     hide;
-    message.error('添加失败，请重试！');
+    message.error(formatMessage({id:"pages.satTable.satItem.addFailed"}));
     return false;
   }
 }
 /**
-* 更新卫星
+* updating success
 * @param fields
 */
 const handleUpdate = async (record: SatListItem, fields: UpdateSatParam) => {
-  const hide = message.loading('正在更新');
+  const { formatMessage } = useIntl();
+  const hide = message.loading(formatMessage({id:"pages.satTable.satItem.updating"}));
   try {
     await updateSat(record.id, fields);
     hide;
 
-    message.success('配置成功');
+    message.success(formatMessage({id:"pages.satTable.satItem.updateSuccess"}));
     return true;
   } catch (error) {
     hide;
-    message.error('配置失败请重试！');
+    message.error(formatMessage({id:"pages.satTable.satItem.updateFailed"}));
     return false;
   }
 };
 
-const deletable = (record: SatListItem, currentUser: CurrentUser | undefined) => {
-  if (currentUser === undefined) {
-    return false
-  } else {
-    //return record.adminId !== 0 && record.id !== currentSat.id
-    return record.id !== currentUser.id
-  }
-}
-
-
 const TableList: React.FC<{}> = () => {
-  /**
-   * 新建窗口的弹窗
-   */
+  const { formatMessage } = useIntl();
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [createSenModalVisible, handleSenModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
@@ -109,18 +99,12 @@ const TableList: React.FC<{}> = () => {
   const [currentRow, setCurrentRow] = useState<SatListItem>();
   const [selectedRowsState, setSelectedRows] = useState<SatListItem[]>([]);
 
-  /**
-   * 国际化配置
-   */
-  const intl = useIntl();
-  const currentUserData = getUserData();
-
   const columns: ProColumns<SatListItem>[] = [
     {
       title: (
         <FormattedMessage
           id="pages.satTable.satItem.nameLabel"
-          defaultMessage="名称"
+          defaultMessage="name"
         />
       ),
       dataIndex: 'name',
@@ -139,7 +123,7 @@ const TableList: React.FC<{}> = () => {
       ]
     },
     {
-      title: '操作',
+      title: 'operation',
       valueType: 'option',
       render: (text, record, _, action) => [
         <a
@@ -149,7 +133,10 @@ const TableList: React.FC<{}> = () => {
             setEditingSat(record)
           }}
         >
-          编辑
+          {formatMessage({
+            id: 'pages.satTable.satItem.edit',
+            defaultMessage: 'edit',
+          })}
         </a>,
         <a
           key="addsen"
@@ -158,38 +145,41 @@ const TableList: React.FC<{}> = () => {
             setEditingSat(record)
           }}
         >
-          添加载荷
-         </a>,
+          {formatMessage({
+            id: 'pages.satTable.satItem.addSen',
+            defaultMessage: 'add sensor',
+          })}
+        </a>,
         <a key="delete"
           onClick={async () => {
             confirm({
-              title: '删除',
+              title: formatMessage({ id: 'pages.satTable.satItem.delete' }),
               icon: <WarningOutlined />,
               content: (<span>
-                确定要删除卫星{' '}
+                {formatMessage({ id: 'pages.satTable.satItem.deleteSatConfirm1' })}
                 <i>
                   <b>{record.name}</b>
-                </i>{' '}
-                吗？
+                </i>
+                {formatMessage({ id: 'pages.satTable.satItem.deleteSatConfirm2' })}
               </span>),
               onOk: async () => {
-                const hide = message.loading('正在删除');
+                const hide = message.loading(formatMessage({ id: 'pages.satTable.satItem.deleting' }));
                 if (!record.id) return true;
                 try {
                   await removeSat(record.id);
                   hide;
-                  message.success('删除成功，即将刷新');
+                  message.success(formatMessage({ id: 'pages.satTable.satItem.deletend' }));
                   actionRef.current?.reload();
                   return true;
                 } catch (error) {
                   hide;
-                  message.error('删除失败，请重试');
+                  message.error(formatMessage({ id: 'pages.satTable.satItem.deletefailed' }));
                   return false;
                 }
               },
             });
           }}>
-          删除
+          {formatMessage({ id: 'pages.satTable.satItem.delete' })}
         </a>,
       ],
     },
@@ -199,23 +189,23 @@ const TableList: React.FC<{}> = () => {
     return (
       <ProTable
         columns={[
-          { title: '名称', dataIndex: 'name', key: 'name' },
+          { title: formatMessage({ id: 'pages.satTable.satItem.nameLabel' }), dataIndex: 'name', key: 'name' },
           {
-            title: '分辨率', dataIndex: 'resolution', key: 'resolution',
+            title: formatMessage({ id: 'pages.satTable.satItem.resolutionLabel' }), dataIndex: 'resolution', key: 'resolution',
           },
-          { title: '幅宽', dataIndex: 'width', key: 'width' },
-          { title: '左侧摆角', dataIndex: 'leftSideAngle', key: 'leftSideAngle' },
-          { title: '右侧摆角', dataIndex: 'rightSideAngle', key: 'rightSideAngle' },
-          { title: '安装角', dataIndex: 'initAngle', key: 'initAngle' },
+          { title: formatMessage({ id: 'pages.satTable.satItem.widthLabel' }), dataIndex: 'width', key: 'width' },
+          { title: formatMessage({ id: 'pages.satTable.satItem.leftSideAngleLabel' }), dataIndex: 'leftSideAngle', key: 'leftSideAngle' },
+          { title: formatMessage({ id: 'pages.satTable.satItem.rightSideAngleLabel' }), dataIndex: 'rightSideAngle', key: 'rightSideAngle' },
+          { title: formatMessage({ id: 'pages.satTable.satItem.initLabel' }), dataIndex: 'initAngle', key: 'initAngle' },
           {
-            title: 'HexColor', dataIndex: 'hexColor',
+            title: formatMessage({ id: 'pages.satTable.satItem.hexColorLabel' }), dataIndex: 'hexColor',
             key: 'hexColor',
             render: (text, record, _, action) => [
               <span key="color" style={{ backgroundColor: record.hexColor }}>{record.hexColor.toUpperCase()}</span>
             ]
           },
           {
-            title: '操作',
+            title: formatMessage({ id: 'pages.satTable.satItem.operation' }),
             valueType: 'option',
             render: (text, record, _, action) => [
               <a
@@ -226,39 +216,39 @@ const TableList: React.FC<{}> = () => {
                   handleSenModalVisible(true);
                 }}
               >
-                编辑
+                {formatMessage({ id: 'pages.satTable.satItem.editSat' })}
               </a>,
               <a key="delete"
                 onClick={async () => {
                   confirm({
-                    title: '删除',
+                    title: formatMessage({ id: 'pages.satTable.satItem.delete' }),
                     icon: <WarningOutlined />,
                     content: (<span>
-                      确定要删除载荷{' '}
+                      {formatMessage({ id: 'pages.satTable.satItem.deleteSenConfirm1' })}
                       <i>
                         <b>{record.name}</b>
                       </i>{' '}
-                     吗？
+                      {formatMessage({ id: 'pages.satTable.satItem.deleteSenConfirm2' })}
                     </span>),
                     onOk: async () => {
-                      const hide = message.loading('正在删除');
+                      const hide = message.loading(formatMessage({ id: 'pages.satTable.satItem.deleting' }));
                       if (!record.id) return true;
                       try {
                         await removeSen(record.id);
                         hide;
-                        message.success('删除成功，即将刷新');
+                        message.success(formatMessage({ id: 'pages.satTable.satItem.deletend' }));
                         actionRef.current?.reload();
                         return true;
                       } catch (error) {
                         hide;
-                        message.error('删除失败，请重试');
+                        message.error(formatMessage({ id: 'pages.satTable.satItem.deletefailed' }));
                         return false;
                       }
                     },
                   });
                 }}>
-                删除
-             </a>,
+                {formatMessage({ id: 'pages.satTable.satItem.delete' })}
+              </a>,
             ]
           },
         ]}
@@ -283,29 +273,29 @@ const TableList: React.FC<{}> = () => {
               style={{ marginRight: 8 }}
               onClick={() => handleModalVisible(true)}
             >
-              新建
-          </Button>
+              {formatMessage({ id: 'pages.satTable.newSat' })}
+            </Button>
           </Col>
           <Col flex="100px" className="addSat">
             <Button
               icon={<ReloadOutlined />}
               style={{ marginRight: 8 }}
               onClick={async () => {
-                const hide = message.loading('正在更新');
+                const hide = message.loading(formatMessage({ id: 'pages.satTable.updatingTLE' }));
                 try {
                   await updateTles();
                   hide;
-                  message.success('更新成功');
+                  message.success(formatMessage({ id: 'pages.satTable.updatingSuccess' }));
                   return true;
                 } catch (error) {
                   hide;
-                  message.error('更新失败，请重试');
+                  message.error(formatMessage({ id: 'pages.satTable.updatingFailed' }));
                   return false;
                 }
               }}
             >
-              更新 TLE
-          </Button>
+              {formatMessage({ id: 'pages.satTable.updateTLE' })}
+            </Button>
           </Col>
           <Col flex="100px" className="addSat">
             <Button
@@ -313,11 +303,11 @@ const TableList: React.FC<{}> = () => {
               style={{ marginRight: 8 }}
               onClick={() => actionRef.current?.reload()}
             >
-              刷新
-          </Button>
+              {formatMessage({ id: 'pages.satTable.refresh' })}
+            </Button>
           </Col>
           <Col flex="auto" className="querySat">
-            <Search placeholder="输入关键字查询"
+            <Search placeholder={formatMessage({ id: 'pages.satTable.satItem.querykeyword' })}
               onChange={e => {
                 if (e.target.value === undefined || e.target.value === '') {
                   setKeyword('')
@@ -350,9 +340,9 @@ const TableList: React.FC<{}> = () => {
         tableAlertRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => (
           <Space size={24}>
             <span>
-              已选 {selectedRowKeys.length} 项
+              {formatMessage({ id: 'pages.satTable.satItem.selected1' })}   {selectedRowKeys.length} {formatMessage({ id: 'pages.satTable.satItem.selected2' })}
               <a style={{ marginLeft: 8 }} onClick={onCleanSelected}>
-                取消选择
+                {formatMessage({ id: 'pages.satTable.satItem.cancelSelection' })}
               </a>
             </span>
           </Space>
@@ -363,35 +353,35 @@ const TableList: React.FC<{}> = () => {
               <a
                 onClick={async () => {
                   confirm({
-                    title: '删除',
+                    title: formatMessage({ id: 'pages.satTable.satItem.delete' }),
                     icon: <WarningOutlined />,
                     content: (<span>
-                      确定要删除卫星{' '}
+                      {formatMessage({ id: 'pages.satTable.satItem.deleteconfirm1' })} {' '}
                       <i>
                         <b>{selectedRowsState.map(row => row.name).join(',')}</b>
                       </i>{' '}
-                    吗？
+                      {formatMessage({ id: 'pages.satTable.satItem.deleteconfirm2' })}
                     </span>),
                     onOk: async () => {
-                      const hide = message.loading('正在删除');
+                      const hide = message.loading(formatMessage({ id: 'pages.satTable.satItem.deleting' }));
                       if (!selectedRowsState) return true;
                       try {
                         await batRemoveSat(selectedRowsState.map(row => row.id));
                         hide;
-                        message.success('删除成功，即将刷新');
+                        message.success(formatMessage({ id: 'pages.satTable.satItem.deletend' }));
                         setSelectedRows([]);
                         actionRef.current?.reloadAndRest?.();
                         return true;
                       } catch (error) {
                         hide;
-                        message.error('删除失败，请重试');
+                        message.error(formatMessage({ id: 'pages.satTable.satItem.deletefailed' }));
                         return false;
                       }
                     },
                   })
                 }}>
-                批量删除
-          </a>
+                {formatMessage({ id: 'pages.satTable.satItem.batDelete' })}
+              </a>
             </Space>
           );
         }}

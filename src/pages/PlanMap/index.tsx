@@ -18,18 +18,13 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { getCenter } from 'ol/extent';
 import Draw, {
   createBox,
-  createRegularPolygon,
 } from 'ol/interaction/Draw';
-import Proj from 'ol/proj';
-import Source from 'ol/source';
 import XYZ from 'ol/source/XYZ';
-import * as olExtent from 'ol/extent';
 import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
 import Geometry from 'ol/geom/Geometry';
-import Point from 'ol/geom/Point';
-import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
-import { DragPan, MouseWheelZoom, defaults } from 'ol/interaction';
+import { Fill, Stroke, Style } from 'ol/style';
+import {  defaults } from 'ol/interaction';
 import Select from 'ol/interaction/Select';
 import { click } from 'ol/events/condition';
 import Overlay from 'ol/Overlay';
@@ -37,20 +32,10 @@ import * as dayjs from 'dayjs'
 
 const { Option } = AntSelect;
 
-//TODO
-/*
-1. add pan control
-2. add path layer, area layer
-3. add switch control function
-4. add path drawing
-5. add calling api to get path 
-6. add custom control to display path details
-*/
 const PlanMap: React.FC<{}> = () => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
   const [checkedSenIds, setCheckedSenIds] = useState<number[]>([]);
-  const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [planningDays, setPlanningDays] = useState<number>(3);
   const refPlanningDays = useRef<number>(planningDays)
@@ -60,11 +45,9 @@ const PlanMap: React.FC<{}> = () => {
   const refContainer = useRef<HTMLDivElement>(null)
   const refContent = useRef<HTMLDivElement>(null)
   const refSenIds = useRef<number[]>(checkedSenIds)
-  const [draw, setDraw] = useState<Draw>();
   const [map, setMap] = useState<Map>();
   const refMap = useRef<Map>()
   const [area, setArea] = useState<Geometry>();
-  const [pathUnits, setPathUnits] = useState<PathUnit[]>();
   const { formatMessage } = useIntl();
 
   refSenIds.current = checkedSenIds
@@ -176,7 +159,6 @@ const PlanMap: React.FC<{}> = () => {
       ymin: ext[1],
       ymax: ext[3],
     } as PlanPara).then(e => {
-      setPathUnits(e.dataList as PathUnit[])
       //draw area
       pathSource.clear()
       let leftPoints: number[][] = [], rightPoints: number[][] = []
@@ -228,7 +210,6 @@ const PlanMap: React.FC<{}> = () => {
       areaSource.clear()
       setArea(undefined)
       pathSource.clear()
-      setPathUnits(undefined)
     })
     draw.on('drawend', (evt) => {
       let bounds = evt.feature.getGeometry().clone()
@@ -290,7 +271,7 @@ const PlanMap: React.FC<{}> = () => {
         }
       }) as DataNode[]
       setSatTree(res)
-      if (res.length != 0) {
+      if (res!=undefined && res.length != 0) {
         setExpandedKeys([res[0].key])
       }
     })
@@ -350,8 +331,6 @@ const PlanMap: React.FC<{}> = () => {
           onCheck={onCheck}
           checkedKeys={checkedKeys}
           showIcon={true}
-          //onSelect={onSelect}
-          selectedKeys={selectedKeys}
           treeData={satTree}
           style={{ color: "#fff", background: "rgb(0,16,32)" }}
         />
