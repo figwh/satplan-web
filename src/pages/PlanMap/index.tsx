@@ -24,7 +24,7 @@ import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
 import Geometry from 'ol/geom/Geometry';
 import { Fill, Stroke, Style } from 'ol/style';
-import {  defaults } from 'ol/interaction';
+import { defaults } from 'ol/interaction';
 import Select from 'ol/interaction/Select';
 import { click } from 'ol/events/condition';
 import Overlay from 'ol/Overlay';
@@ -48,11 +48,24 @@ const PlanMap: React.FC<{}> = () => {
   const [map, setMap] = useState<Map>();
   const refMap = useRef<Map>()
   const [area, setArea] = useState<Geometry>();
-  const { formatMessage } = useIntl();
+  const refArea = useRef<Geometry>()
 
   refSenIds.current = checkedSenIds
   refPlanningDays.current = planningDays
   refMap.current = map
+  refArea.current = area
+
+  const areaSource = new VectorSource({ wrapX: false });
+  const areaLayer = new VectorLayer({
+    source: areaSource,
+    className: "area",
+  });
+
+  const pathSource = new VectorSource({ wrapX: false });
+  const pathLayer = new VectorLayer({
+    source: pathSource,
+    className: "path",
+  });
 
   const mousePositionControl = new MousePosition({
     coordinateFormat: createStringXY(4),
@@ -62,29 +75,6 @@ const PlanMap: React.FC<{}> = () => {
     className: 'custom-mouse-position',
     //target: document.getElementById('mouse-position'),
   });
-
-  const areaSource = new VectorSource({ wrapX: false });
-  const areaLayer = new VectorLayer({
-    source: areaSource,
-  });
-
-  const pathSource = new VectorSource({ wrapX: false });
-  const pathLayer = new VectorLayer({
-    source: pathSource,
-  });
-
-  const overlay = useMemo(() => {
-    if (refContainer.current == null) {
-      return undefined
-    }
-    return new Overlay({
-      element: refContainer.current,
-      autoPan: true,
-      autoPanAnimation: {
-        duration: 250,
-      },
-    })
-  }, [refContainer.current]);
 
   useEffect(() => {
     if (refContainer.current == null || refMap.current == undefined) { return }
@@ -144,7 +134,21 @@ const PlanMap: React.FC<{}> = () => {
     refMap.current.addInteraction(drawTool)
   }
 
-  const afterDrawed = (g: Geometry, senIds: number[], planningDays: number) => {
+  const afterDrawed = (g: Geometry | undefined, senIds: number[], planningDays: number) => {
+    let pathLayerSource: VectorSource | undefined = undefined
+    if (refMap.current === undefined) { return }
+    refMap.current.getLayers().forEach(function (el) {
+      if (el.getClassName() === "path") {
+        if (el instanceof VectorLayer) {
+          pathLayerSource = el.getSource()
+          return
+        }
+      }
+    })
+    if (refMap.current === undefined || senIds.length == 0 || g === undefined) {
+      pathLayerSource.clear()
+      return
+    }
     let clonedGeo = g.clone()
     clonedGeo.transform("EPSG:900913", "EPSG:4326")
     let ext = clonedGeo.getExtent()
@@ -159,8 +163,9 @@ const PlanMap: React.FC<{}> = () => {
       ymin: ext[1],
       ymax: ext[3],
     } as PlanPara).then(e => {
+      if (pathLayerSource === undefined) { return }
       //draw area
-      pathSource.clear()
+      pathLayerSource.clear()
       let leftPoints: number[][] = [], rightPoints: number[][] = []
       let features: Feature<Geometry>[] = []
       e.dataList.forEach((u: PathUnit) => {
@@ -194,7 +199,7 @@ const PlanMap: React.FC<{}> = () => {
           features.push(fea)
         }
       });
-      pathSource.addFeatures(features)
+      pathLayerSource.addFeatures(features)
 
       switchToSelect()
     })
@@ -208,8 +213,8 @@ const PlanMap: React.FC<{}> = () => {
     })
     draw.on('drawstart', (evt) => {
       areaSource.clear()
-      setArea(undefined)
       pathSource.clear()
+      setArea(undefined)
     })
     draw.on('drawend', (evt) => {
       let bounds = evt.feature.getGeometry().clone()
@@ -271,7 +276,7 @@ const PlanMap: React.FC<{}> = () => {
         }
       }) as DataNode[]
       setSatTree(res)
-      if (res!=undefined && res.length != 0) {
+      if (res != undefined && res.length != 0) {
         setExpandedKeys([res[0].key])
       }
     })
@@ -299,20 +304,8 @@ const PlanMap: React.FC<{}> = () => {
     setCheckedKeys(checkedKeysValue);
     setCheckedSenIds(senIds)
 
-    if (area != undefined && senIds.length != 0) {
-      afterDrawed(area, senIds, refPlanningDays.current)
-    }
+    afterDrawed(refArea.current, senIds, refPlanningDays.current)
   };
-
-  const onSelect = (selectedKeysValue: React.Key[], info: any) => {
-    //console.log('onSelect', info);
-    //setSelectedKeys(selectedKeysValue);
-  };
-
-  /**
-   * 国际化配置
-   */
-  const intl = useIntl();
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -341,6 +334,7 @@ const PlanMap: React.FC<{}> = () => {
           <span style={{ color: "white" }}>Planning in next : </span>
           <AntSelect defaultValue="3" style={{ width: 120 }} onChange={e => {
             setPlanningDays(Number(e))
+            afterDrawed(refArea.current, refSenIds.current, Number(e))
           }}>
             <Option value="1">1</Option>
             <Option value="2">2</Option>
