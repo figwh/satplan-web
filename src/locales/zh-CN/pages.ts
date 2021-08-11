@@ -28,6 +28,7 @@ export default {
   'pages.admin.subPage.alertMessage': 'umi ui 现已发布，欢迎使用 npm run ui 启动体验。',
   'pages.userSettings.oldPasswordRule':'请选择旧密码',
   'pages.userSettings.newPasswordRule':'请选择新密码',
+  'pages.satTable.satName':'卫星名',
   'pages.satTable.satItem.nameLabel': '名称',
   'pages.satTable.satItem.noardIdLabel': 'NoardID',
   'pages.satTable.satItem.hexColorLabel': '颜色',
@@ -47,7 +48,7 @@ export default {
   'pages.satTable.satItem.widthLabel': '幅宽',
   'pages.satTable.satItem.leftSideAngleLabel': '左侧摆角',
   'pages.satTable.satItem.rightSideAngleLabel': '右侧摆角',
-  'pages.satTable.satItem.initSideAngleLabel': '安装角',
+  'pages.satTable.satItem.initAngleLabel': '安装角',
   'pages.satTable.satItem.operation': '操作',
   'pages.satTable.satItem.deleteSenConfirm1':'确定要删除载荷 ',
   'pages.satTable.satItem.deleteSenConfirm2':' 吗?',
@@ -67,4 +68,6 @@ export default {
   'pages.satTable.satItem.updating':'正在更新',
   'pages.satTable.satItem.updateSuccess':'更新成功',
   'pages.satTable.satItem.updateFailed':'更新失败，请重试',
+  'pages.satTable.senName':'载荷名',
+  'pages.satTable.satItem.color':'颜色',
 };

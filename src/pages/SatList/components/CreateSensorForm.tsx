@@ -17,19 +17,16 @@ interface CreateSensorFormProps {
 const CreateSensorForm: React.FC<CreateSensorFormProps> = (props) => {
   const { editingRecord, satName, modalVisible, onCancel, onOk } = props;
   const [senColor, setSenColor] = useState<string>("#000000")
-  const intl = useIntl();
+  const { formatMessage } = useIntl();
   const [form] = Form.useForm();
 
   return (
     <ModalForm
       form={form}
       layout="horizontal"
-      labelCol={{ span: 5 }}
-      wrapperCol={{ span: 16 }}
-      title={intl.formatMessage({
-        id: 'pages.satTable.newSen',
-        defaultMessage: '新建载荷',
-      })}
+      labelCol={{ span: 6 }}
+      wrapperCol={{ span: 18 }}
+      title={formatMessage({ id: 'pages.satTable.satItem.addSen' })}
       width="700px"
       labelAlign='right'
       visible={modalVisible}
@@ -50,67 +47,65 @@ const CreateSensorForm: React.FC<CreateSensorFormProps> = (props) => {
         }
       }}
     >
-      <ProForm.Group>
-        <ProFormText
-          width="sm"
-          name="satName"
-          label="卫星名"
-          initialValue={satName}
-          disabled={true}
-          placeholder="卫星名"
-        />
-        <ProFormText
-          width="sm"
-          name="name"
-          label="载荷名"
-          placeholder="载荷名"
-          initialValue={editingRecord === undefined ? "" : editingRecord.name}
-          required={true}
-        />
-        <ProFormDigit
-          width="sm"
-          name="resolution"
-          label="分辨率"
-          placeholder="分辨率"
-          initialValue={editingRecord === undefined ? 0 : editingRecord.resolution}
-          required={true}
-        />
-        <ProFormDigit
-          width="sm"
-          name="width"
-          label="幅宽"
-          placeholder="幅宽"
-          initialValue={editingRecord === undefined ? 0 : editingRecord.width}
-          required={true}
-        />
-        <ProFormDigit
-          width="sm"
-          name="leftSideAngle"
-          label="左侧摆角"
-          placeholder="左侧摆角"
-          initialValue={editingRecord === undefined ? 0 : editingRecord.leftSideAngle}
-        />
-        <ProFormDigit
-          width="sm"
-          name="rightSideAngle"
-          label="右侧摆角"
-          placeholder="右侧摆角"
-          initialValue={editingRecord === undefined ? 0 : editingRecord.rightSideAngle}
-        />
-        <ProFormDigit
-          width="sm"
-          name="initAngle"
-          label="安装角"
-          placeholder="安装角"
-          initialValue={editingRecord === undefined ? 0 : editingRecord.initAngle}
-        />
-        <Form.Item name="satColor" label="颜色">
-          <ColorButton initColor={editingRecord === undefined ? "#FFFFFF" : editingRecord.hexColor}
-            onValueChanged={(c) => {
-              setSenColor(c)
-            }} />
-        </Form.Item>
-      </ProForm.Group>
+      <ProFormText
+        width="md"
+        name="satName"
+        label={formatMessage({ id: 'pages.satTable.satName' })}
+        initialValue={satName}
+        disabled={true}
+        placeholder={formatMessage({ id: 'pages.satTable.satName' })}
+      />
+      <ProFormText
+        width="md"
+        name="name"
+        label={formatMessage({ id: 'pages.satTable.senName' })}
+        placeholder={formatMessage({ id: 'pages.satTable.senName' })}
+        initialValue={editingRecord === undefined ? "" : editingRecord.name}
+        required={true}
+      />
+      <ProFormDigit
+        width="md"
+        name="resolution"
+        label={formatMessage({ id: 'pages.satTable.satItem.resolutionLabel' })}
+        placeholder={formatMessage({ id: 'pages.satTable.satItem.resolutionLabel' })}
+        initialValue={editingRecord === undefined ? 0 : editingRecord.resolution}
+        required={true}
+      />
+      <ProFormDigit
+        width="md"
+        name="width"
+        label={formatMessage({ id: 'pages.satTable.satItem.widthLabel' })}
+        placeholder={formatMessage({ id: 'pages.satTable.satItem.widthLabel' })}
+        initialValue={editingRecord === undefined ? 0 : editingRecord.width}
+        required={true}
+      />
+      <ProFormDigit
+        width="md"
+        name="leftSideAngle"
+        label={formatMessage({ id: 'pages.satTable.satItem.leftSideAngleLabel' })}
+        placeholder={formatMessage({ id: 'pages.satTable.satItem.leftSideAngleLabel' })}
+        initialValue={editingRecord === undefined ? 0 : editingRecord.leftSideAngle}
+      />
+      <ProFormDigit
+        width="md"
+        name="rightSideAngle"
+        label={formatMessage({ id: 'pages.satTable.satItem.rightSideAngleLabel' })}
+        placeholder={formatMessage({ id: 'pages.satTable.satItem.rightSideAngleLabel' })}
+        initialValue={editingRecord === undefined ? 0 : editingRecord.rightSideAngle}
+      />
+      <ProFormDigit
+        width="md"
+        name="initAngle"
+        label={formatMessage({ id: 'pages.satTable.satItem.initAngleLabel' })}
+        placeholder={formatMessage({ id: 'pages.satTable.satItem.initAngleLabel' })}
+        initialValue={editingRecord === undefined ? 0 : editingRecord.initAngle}
+      />
+      <Form.Item name="satColor" label={formatMessage({ id: 'pages.satTable.satItem.color' })}>
+        <ColorButton initColor={editingRecord === undefined ? "#FFFFFF" : editingRecord.hexColor}
+          onValueChanged={(c) => {
+            setSenColor(c)
+          }} />
+      </Form.Item>
     </ModalForm>
   );
 };
